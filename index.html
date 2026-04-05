@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Caja Feria Pro</title>
+    <title>Caja Feria Pro + Notas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
@@ -18,7 +18,7 @@
 <body class="min-h-screen pb-32">
 
     <div id="app" class="max-w-md mx-auto px-4">
-        <!-- Navegación de Puestos Corregida -->
+        <!-- Navegación de Puestos -->
         <nav class="flex bg-white border-b sticky top-0 z-40 -mx-4 mb-4 shadow-sm no-print">
             <button onclick="switchBooth('bijou')" id="tab-bijou" class="flex-1 py-4 text-[10px] font-black uppercase active-tab-bijou tracking-tight">✨ A TU ESTILO.</button>
             <button onclick="switchBooth('okidokie')" id="tab-okidokie" class="flex-1 py-4 text-[10px] font-black uppercase text-slate-400 tracking-tight">🤖 OKIEDOKIE</button>
@@ -50,9 +50,10 @@
             <button onclick="generateReport()" class="w-full py-4 bg-slate-900 text-white font-black rounded-2xl shadow-lg uppercase text-xs btn-active">📄 Reporte con Horarios</button>
             
             <div class="grid grid-cols-2 gap-2">
-                <button onclick="openConfig()" class="py-3 bg-slate-100 text-slate-600 font-bold rounded-xl uppercase text-[10px] btn-active">📦 Gestionar Stock</button>
-                <button onclick="closeDay()" class="py-3 bg-red-50 text-red-600 font-bold rounded-xl uppercase text-[10px] btn-active">⚠️ Cierre de Caja</button>
+                <button onclick="openConfig()" class="py-3 bg-slate-100 text-slate-600 font-bold rounded-xl uppercase text-[10px] btn-active">📦 Stock</button>
+                <button onclick="openNotes()" class="py-3 bg-amber-100 text-amber-700 font-bold rounded-xl uppercase text-[10px] btn-active">📝 Anotador</button>
             </div>
+            <button onclick="closeDay()" class="w-full py-3 bg-red-50 text-red-600 font-bold rounded-xl uppercase text-[10px] btn-active">⚠️ Cierre de Caja</button>
         </div>
     </div>
 
@@ -80,16 +81,32 @@
     <div id="config-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto no-print">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 class="font-black uppercase text-lg">Inventario</h2>
+                <h2 class="font-black uppercase text-lg text-slate-800">Inventario</h2>
                 <button onclick="closeConfig()" class="text-2xl text-slate-300">✕</button>
             </div>
-            <div class="bg-slate-50 p-5 rounded-3xl mb-6 border border-slate-100 shadow-inner">
+            <div class="bg-slate-50 p-5 rounded-3xl mb-6 border border-slate-100">
                 <p class="text-[9px] font-black uppercase text-slate-400 mb-3 tracking-widest">Nuevo Producto</p>
-                <input id="in-name" type="text" placeholder="Nombre (ej: Llavero Chimuelo)" class="w-full p-4 rounded-xl border mb-2 font-bold text-sm shadow-sm outline-none">
-                <input id="in-price" type="number" placeholder="Precio ($)" class="w-full p-4 rounded-xl border mb-4 font-bold text-sm shadow-sm outline-none">
-                <button onclick="saveProduct()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl uppercase text-xs btn-active shadow-lg">Guardar en Lista</button>
+                <input id="in-name" type="text" placeholder="Nombre del producto" class="w-full p-4 rounded-xl border mb-2 font-bold text-sm outline-none">
+                <input id="in-price" type="number" placeholder="Precio ($)" class="w-full p-4 rounded-xl border mb-4 font-bold text-sm outline-none">
+                <button onclick="saveProduct()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl uppercase text-xs btn-active shadow-lg">Guardar Producto</button>
             </div>
             <div id="edit-list" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Modal Anotador (NUEVO) -->
+    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto no-print">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="font-black uppercase text-lg text-slate-800">📝 Notas Rápidas</h2>
+                <button onclick="closeNotes()" class="text-2xl text-slate-300">✕</button>
+            </div>
+            <div class="bg-amber-50 p-5 rounded-3xl mb-6 border border-amber-100">
+                <p class="text-[9px] font-black uppercase text-amber-600 mb-3 tracking-widest">Anotar algo para después</p>
+                <textarea id="note-text" placeholder="Ej: Traer llaveros de Messi, Cliente pidió aro de plata..." class="w-full p-4 rounded-xl border border-amber-200 mb-3 font-bold text-sm outline-none h-24 bg-white"></textarea>
+                <button onclick="saveNote()" class="w-full py-4 bg-amber-600 text-white font-bold rounded-xl uppercase text-xs btn-active shadow-lg">Agregar Nota</button>
+            </div>
+            <div id="notes-list" class="space-y-3"></div>
         </div>
     </div>
 
@@ -111,6 +128,7 @@
 
         const getProducts = (b) => JSON.parse(localStorage.getItem(b + '_items')) || [];
         const getSales = (b) => JSON.parse(localStorage.getItem(b + '_sales')) || [];
+        const getNotes = () => JSON.parse(localStorage.getItem('feria_notes')) || [];
         const saveState = (b, i, s) => { localStorage.setItem(b + '_items', JSON.stringify(i)); localStorage.setItem(b + '_sales', JSON.stringify(s)); };
 
         function switchBooth(b) {
@@ -191,6 +209,7 @@
             document.getElementById('report-modal').classList.remove('hidden');
         }
 
+        // --- Funciones de Stock ---
         function saveProduct() {
             const n = document.getElementById('in-name').value;
             const p = parseInt(document.getElementById('in-price').value);
@@ -201,20 +220,45 @@
             document.getElementById('in-name').value = ""; document.getElementById('in-price').value = "";
             render(); renderEditList();
         }
-
-        function removeProduct(id) { if(confirm("¿Eliminar este producto de la lista?")) { const items = getProducts(currentBooth).filter(i => i.id !== id); saveState(currentBooth, items, getSales(currentBooth)); render(); renderEditList(); } }
-        
+        function removeProduct(id) { if(confirm("¿Eliminar este producto?")) { const items = getProducts(currentBooth).filter(i => i.id !== id); saveState(currentBooth, items, getSales(currentBooth)); render(); renderEditList(); } }
         function renderEditList() {
             const items = getProducts(currentBooth);
             document.getElementById('edit-list').innerHTML = items.map(i => `
-                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-2">
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border mb-2">
                     <span class="text-[10px] font-black uppercase text-slate-700">${i.name} ($${i.price})</span>
                     <button onclick="removeProduct(${i.id})" class="text-red-500 font-black p-2 bg-red-50 rounded-full w-8 h-8 flex items-center justify-center">✕</button>
                 </div>
             `).join('');
         }
 
-        function closeDay() { if(confirm("⚠️ ¿Cerrar el día?\nEsto vaciará las ventas de hoy para mañana empezar de cero.")) { localStorage.setItem(currentBooth + '_sales', "[]"); render(); } }
+        // --- Funciones de Notas (NUEVO) ---
+        function openNotes() { document.getElementById('notes-modal').classList.remove('hidden'); renderNotes(); }
+        function closeNotes() { document.getElementById('notes-modal').classList.add('hidden'); }
+        function saveNote() {
+            const text = document.getElementById('note-text').value;
+            if(!text) return;
+            const notes = getNotes();
+            notes.push({ id: Date.now(), text: text });
+            localStorage.setItem('feria_notes', JSON.stringify(notes));
+            document.getElementById('note-text').value = "";
+            renderNotes();
+        }
+        function deleteNote(id) {
+            const notes = getNotes().filter(n => n.id !== id);
+            localStorage.setItem('feria_notes', JSON.stringify(notes));
+            renderNotes();
+        }
+        function renderNotes() {
+            const notes = getNotes();
+            document.getElementById('notes-list').innerHTML = notes.map(n => `
+                <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100 shadow-sm relative group">
+                    <p class="text-xs font-bold text-amber-900 leading-relaxed pr-8">${n.text}</p>
+                    <button onclick="deleteNote(${n.id})" class="absolute top-3 right-3 text-amber-300 hover:text-amber-600 font-black">✕</button>
+                </div>
+            `).join('') || '<p class="text-center py-10 text-slate-300 font-bold uppercase text-[10px]">Sin notas pendientes</p>';
+        }
+
+        function closeDay() { if(confirm("⚠️ ¿Cerrar el día? Se limpiarán las ventas pero tus productos y notas se mantienen.")) { localStorage.setItem(currentBooth + '_sales', "[]"); render(); } }
         function openConfig() { document.getElementById('config-modal').classList.remove('hidden'); renderEditList(); }
         function closeConfig() { document.getElementById('config-modal').classList.add('hidden'); }
         function closeConfirm() { document.getElementById('confirm-modal').classList.add('hidden'); }
