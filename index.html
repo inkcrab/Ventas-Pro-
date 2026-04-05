@@ -1,0 +1,400 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Caja Feria - Gestión Total</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            background-color: #f8fafc;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .active-tab-bijou { border-bottom: 4px solid #db2777; color: #db2777; }
+        .active-tab-3d { border-bottom: 4px solid #4f46e5; color: #4f46e5; }
+        .btn-active:active { transform: scale(0.95); opacity: 0.8; }
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeIn 0.2s ease-out; }
+        @media print { .no-print { display: none; } }
+        input[type="number"] { -moz-appearance: textfield; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="min-h-screen pb-32">
+
+    <div id="app" class="max-w-md mx-auto px-4">
+        <!-- Navegación de Puestos -->
+        <nav class="flex bg-white border-b border-slate-200 sticky top-0 z-30 -mx-4 mb-4 shadow-sm no-print">
+            <button onclick="switchBooth('bijou')" id="tab-bijou" class="flex-1 py-4 text-[11px] font-extrabold uppercase active-tab-bijou">✨ A tu estilo.</button>
+            <button onclick="switchBooth('okidokie')" id="tab-okidokie" class="flex-1 py-4 text-[11px] font-extrabold uppercase text-slate-400">🤖 Okiedokie</button>
+        </nav>
+
+        <!-- Totales Rápidos -->
+        <div class="relative grid grid-cols-2 gap-3 mb-4 no-print">
+            <div class="bg-emerald-500 p-4 rounded-2xl text-white shadow-lg shadow-emerald-100">
+                <p class="text-[9px] font-bold uppercase opacity-80">Efectivo Hoy</p>
+                <p id="total-cash" class="text-xl font-extrabold">$0</p>
+            </div>
+            <div class="bg-sky-500 p-4 rounded-2xl text-white shadow-lg shadow-sky-100">
+                <p class="text-[9px] font-bold uppercase opacity-80">M. Pago Hoy</p>
+                <p id="total-mp" class="text-xl font-extrabold">$0</p>
+            </div>
+            <button onclick="undoLastSale()" id="undo-btn" class="hidden absolute -right-2 -top-2 w-10 h-10 bg-orange-500 text-white rounded-full shadow-lg flex items-center justify-center border-2 border-white btn-active z-10 text-xs">↩️</button>
+        </div>
+
+        <!-- BUSCADOR CON LUPITA -->
+        <div class="mb-6 no-print">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input type="text" id="search-input" oninput="render()" placeholder="Buscar producto..." 
+                    class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 shadow-sm outline-none focus:border-indigo-500 transition-all text-sm">
+            </div>
+        </div>
+
+        <!-- Título de Sección y Botón Agregar -->
+        <div class="flex justify-between items-center mb-4 px-1 no-print">
+            <h2 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Inventario Actual</h2>
+            <button onclick="openConfig()" class="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg btn-active font-bold text-xl">+</button>
+        </div>
+
+        <!-- Rejilla de Productos -->
+        <div id="products-grid" class="product-grid mb-8"></div>
+
+        <!-- Botones de Acción Inferiores -->
+        <div class="space-y-3 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm no-print">
+            <button onclick="generateReport()" class="w-full py-4 bg-slate-900 text-white font-bold rounded-xl shadow-lg uppercase text-sm btn-active">📄 Reporte de Hoy</button>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="openMissingList()" class="py-4 bg-sky-100 text-sky-700 font-bold rounded-xl uppercase text-[10px] btn-active">📋 Faltantes</button>
+                <button onclick="openHistory()" class="py-4 bg-orange-100 text-orange-700 font-bold rounded-xl uppercase text-[10px] btn-active">📅 Historial</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t mt-2">
+                <button onclick="openConfig()" class="py-3 text-slate-500 font-bold uppercase text-[9px] btn-active">📦 Gestionar Productos</button>
+                <button onclick="closeDay()" class="py-3 bg-red-50 text-red-600 font-bold rounded-xl uppercase text-[9px] btn-active">⚠️ Cerrar Día</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE COBRO (Venta) -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[110] flex items-center justify-center p-6 no-print">
+        <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl animate-in text-center">
+            <h3 id="confirm-item-name" class="text-2xl font-black text-slate-800 mb-1 leading-tight uppercase tracking-tighter">Producto</h3>
+            <div class="my-6">
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-3">Cantidad</p>
+                <div class="flex items-center justify-center gap-6">
+                    <button onclick="updateQty(-1)" class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-xl font-bold">−</button>
+                    <span id="confirm-qty" class="text-3xl font-black text-slate-800">1</span>
+                    <button onclick="updateQty(1)" class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-xl font-bold">+</button>
+                </div>
+            </div>
+            <div class="mb-8 p-4 bg-indigo-50 rounded-2xl border-2 border-indigo-100">
+                <p id="confirm-total" class="text-3xl font-black text-indigo-600">$0</p>
+            </div>
+            <div class="space-y-3">
+                <button onclick="confirmSale('cash')" class="w-full py-4 bg-emerald-500 text-white font-black rounded-2xl text-xs uppercase shadow-md btn-active">💵 EFECTIVO</button>
+                <button onclick="confirmSale('mp')" class="w-full py-4 bg-sky-500 text-white font-black rounded-2xl text-xs uppercase shadow-md btn-active">📱 MERCADO PAGO</button>
+                <button onclick="closeConfirm()" class="w-full py-3 text-slate-400 font-bold text-[10px] uppercase pt-4 tracking-widest">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GESTIÓN (Añadir/Editar/Borrar) -->
+    <div id="config-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] flex items-end justify-center no-print">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] p-8 animate-in shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between mb-6 sticky top-0 bg-white pt-2 pb-4 border-b">
+                <h3 id="config-title" class="font-black uppercase text-slate-800">Nuevo Producto</h3>
+                <button onclick="closeConfig()" class="text-slate-400 font-bold text-2xl p-2">✕</button>
+            </div>
+            <div class="space-y-3 mb-8">
+                <input id="in-id" type="hidden">
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-2 tracking-widest">Nombre del producto</label>
+                    <input id="in-name" type="text" placeholder="Ej: Collar" class="w-full p-4 bg-slate-100 rounded-xl font-bold outline-none border-2 border-transparent focus:border-slate-900 transition-all text-sm">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-2 tracking-widest">Precio ($)</label>
+                    <input id="in-price" type="number" placeholder="0" class="w-full p-4 bg-slate-100 rounded-xl font-bold outline-none border-2 border-transparent focus:border-slate-900 transition-all text-sm">
+                </div>
+                <button id="btn-save-prod" onclick="saveProduct()" class="w-full py-4 bg-slate-900 text-white font-bold rounded-xl uppercase shadow-lg btn-active">Guardar Producto</button>
+                <button id="btn-cancel-edit" onclick="resetConfigForm()" class="hidden w-full py-2 text-slate-400 font-bold uppercase text-[9px] tracking-widest">Cancelar Edición</button>
+            </div>
+            
+            <div class="mt-4">
+                <p class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-widest border-b pb-2">Lista para Editar/Borrar</p>
+                <div id="edit-list" class="space-y-2 pb-10"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIAL -->
+    <div id="history-modal" class="hidden fixed inset-0 bg-white z-[120] overflow-y-auto p-6 no-print">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-black uppercase text-slate-800 text-xl">📅 Historial</h3>
+                <button onclick="closeHistory()" class="font-bold text-slate-400 text-xl">✕</button>
+            </div>
+            <div id="history-list" class="space-y-4 mb-8"></div>
+            <div id="monthly-balance" class="bg-slate-900 text-white p-6 rounded-[2rem] text-center shadow-xl">
+                <p class="text-[10px] font-bold opacity-50 uppercase mb-2">Acumulado</p>
+                <p id="grand-total" class="text-4xl font-black mb-4">$0</p>
+                <div class="flex justify-between text-[10px] font-bold uppercase border-t border-white/10 pt-4">
+                    <span id="grand-cash" class="text-emerald-400">EF: $0</span>
+                    <span id="grand-mp" class="text-sky-400">MP: $0</span>
+                </div>
+            </div>
+            <button onclick="clearHistory()" class="w-full mt-10 py-3 text-red-300 font-bold uppercase text-[9px]">Borrar todo el historial</button>
+        </div>
+    </div>
+
+    <!-- MODAL FALTANTES -->
+    <div id="missing-modal" class="hidden fixed inset-0 bg-white z-[120] p-6 overflow-y-auto no-print">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-black uppercase text-slate-800">📋 Para Reponer</h3>
+                <button onclick="closeMissingList()" class="text-xl">✕</button>
+            </div>
+            <div id="missing-content" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- MODAL REPORTE -->
+    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[120] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between mb-8 no-print">
+                <button onclick="closeReport()" class="font-bold">✕ Cerrar</button>
+                <button onclick="window.print()" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs">Imprimir / PDF</button>
+            </div>
+            <div id="report-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentBooth = 'bijou';
+        let pendingItem = null;
+        let currentQty = 1;
+
+        // Persistencia Local
+        const getProducts = (b) => JSON.parse(localStorage.getItem(b + '_items')) || [];
+        const getSales = (b) => JSON.parse(localStorage.getItem(b + '_sales')) || [];
+        const getMissing = (b) => JSON.parse(localStorage.getItem(b + '_missing')) || {};
+        const getHistory = (b) => JSON.parse(localStorage.getItem(b + '_history')) || [];
+
+        const saveState = (b, i, s, m, h) => { 
+            localStorage.setItem(b + '_items', JSON.stringify(i)); 
+            localStorage.setItem(b + '_sales', JSON.stringify(s)); 
+            localStorage.setItem(b + '_missing', JSON.stringify(m));
+            if(h) localStorage.setItem(b + '_history', JSON.stringify(h));
+        };
+
+        function switchBooth(b) {
+            currentBooth = b;
+            document.getElementById('tab-bijou').classList.toggle('active-tab-bijou', b === 'bijou');
+            document.getElementById('tab-okidokie').classList.toggle('active-tab-3d', b === 'okidokie');
+            document.getElementById('search-input').value = "";
+            render();
+        }
+
+        // Render Principal
+        function render() {
+            const items = getProducts(currentBooth); 
+            const sales = getSales(currentBooth);
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filteredItems = items.filter(i => i.name.toLowerCase().includes(searchTerm));
+
+            let c = 0, m = 0; 
+            sales.forEach(s => { if (s.method === 'cash') c += s.totalPrice; else m += s.totalPrice; });
+            
+            document.getElementById('total-cash').innerText = "$" + c.toLocaleString();
+            document.getElementById('total-mp').innerText = "$" + m.toLocaleString();
+            document.getElementById('undo-btn').classList.toggle('hidden', sales.length === 0);
+            
+            const grid = document.getElementById('products-grid');
+            
+            if (filteredItems.length > 0) {
+                grid.innerHTML = filteredItems.map(i => {
+                    const q = sales.filter(s => s.id === i.id).reduce((acc, curr) => acc + curr.qty, 0);
+                    return `<button onclick="askConfirmation(${i.id})" class="relative bg-white border border-slate-100 p-5 rounded-[2.2rem] text-left shadow-sm btn-active flex flex-col h-32 justify-between animate-in">
+                        <div><h4 class="font-black text-slate-800 text-[11px] uppercase truncate">${i.name}</h4><p class="text-indigo-500 font-black text-xs">$${i.price.toLocaleString()}</p></div>
+                        ${q > 0 ? `<div class="absolute top-2 right-2 bg-slate-900 text-white text-[9px] font-black px-2 h-6 flex items-center justify-center rounded-full border-2 border-white shadow-md">${q}</div>` : ''}
+                        <span class="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Vender ➔</span></button>`;
+                }).join('');
+            } else if (searchTerm !== "") {
+                grid.innerHTML = `<div class="col-span-2 py-10 text-center bg-white rounded-3xl border border-slate-100"><p class="text-slate-400 font-bold uppercase text-[9px] mb-3">No hay resultados para "${searchTerm}"</p><button onclick="openConfigConNombre('${searchTerm}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-[9px] font-bold uppercase">Crear nuevo</button></div>`;
+            } else {
+                grid.innerHTML = `<div class="col-span-2 py-10 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200"><p class="text-slate-400 font-bold uppercase text-[9px] mb-3">No hay productos en este puesto</p><button onclick="openConfig()" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-[9px] font-bold uppercase">Añadir primero</button></div>`;
+            }
+        }
+
+        // Gestión de Productos (CRUD)
+        function openConfig() { resetConfigForm(); document.getElementById('config-modal').classList.remove('hidden'); renderEditList(); }
+        function openConfigConNombre(n) { openConfig(); document.getElementById('in-name').value = n; }
+        function closeConfig() { document.getElementById('config-modal').classList.add('hidden'); }
+
+        function saveProduct() { 
+            const id = document.getElementById('in-id').value;
+            const n = document.getElementById('in-name').value;
+            const p = parseFloat(document.getElementById('in-price').value); 
+            if(!n || isNaN(p)) return alert("Por favor, completa nombre y precio"); 
+            let items = getProducts(currentBooth); 
+            if(id) {
+                items = items.map(i => i.id == id ? { ...i, name: n, price: p } : i);
+            } else {
+                items.push({ id: Date.now(), name: n, price: p }); 
+            }
+            saveState(currentBooth, items, getSales(currentBooth), getMissing(currentBooth)); 
+            render(); renderEditList(); resetConfigForm();
+        }
+
+        function resetConfigForm() {
+            document.getElementById('in-id').value = "";
+            document.getElementById('in-name').value = "";
+            document.getElementById('in-price').value = "";
+            document.getElementById('config-title').innerText = "Nuevo Producto";
+            document.getElementById('btn-save-prod').innerText = "Añadir Producto";
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+        }
+
+        function editProduct(id) {
+            const item = getProducts(currentBooth).find(i => i.id == id);
+            if(item) {
+                document.getElementById('in-id').value = item.id;
+                document.getElementById('in-name').value = item.name;
+                document.getElementById('in-price').value = item.price;
+                document.getElementById('config-title').innerText = "Editando Producto";
+                document.getElementById('btn-save-prod').innerText = "Actualizar";
+                document.getElementById('btn-cancel-edit').classList.remove('hidden');
+                document.getElementById('config-modal').scrollTop = 0;
+            }
+        }
+
+        function removeProduct(id) { 
+            if(!confirm("¿Borrar definitivamente?")) return;
+            const items = getProducts(currentBooth).filter(i => i.id != id); 
+            saveState(currentBooth, items, getSales(currentBooth), getMissing(currentBooth)); 
+            render(); renderEditList(); 
+        }
+
+        function renderEditList() { 
+            const items = getProducts(currentBooth);
+            document.getElementById('edit-list').innerHTML = items.map(i => `
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="flex-1 min-w-0 mr-2">
+                        <p class="text-xs font-black text-slate-800 uppercase truncate">${i.name}</p>
+                        <p class="text-[10px] font-bold text-indigo-600">$${i.price.toLocaleString()}</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="editProduct(${i.id})" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg text-[9px] font-black uppercase">Editar</button>
+                        <button onclick="removeProduct(${i.id})" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-[9px] font-black uppercase">X</button>
+                    </div>
+                </div>`).join('') || '<p class="text-center py-6 text-slate-300 text-[9px] font-bold uppercase">Vacío</p>'; 
+        }
+
+        // Ventas
+        function askConfirmation(id) {
+            pendingItem = getProducts(currentBooth).find(i => i.id === id);
+            currentQty = 1; updateQtyDisplay();
+            document.getElementById('confirm-item-name').innerText = pendingItem.name;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function updateQty(val) { currentQty += val; if (currentQty < 1) currentQty = 1; updateQtyDisplay(); }
+        function updateQtyDisplay() {
+            document.getElementById('confirm-qty').innerText = currentQty;
+            document.getElementById('confirm-total').innerText = "$" + (pendingItem ? (pendingItem.price * currentQty).toLocaleString() : 0);
+        }
+
+        function confirmSale(method) {
+            const sales = getSales(currentBooth);
+            const missing = getMissing(currentBooth);
+            sales.push({ ...pendingItem, method, qty: currentQty, totalPrice: pendingItem.price * currentQty, timestamp: Date.now() });
+            missing[pendingItem.name] = (missing[pendingItem.name] || 0) + currentQty;
+            saveState(currentBooth, getProducts(currentBooth), sales, missing);
+            document.getElementById('confirm-modal').classList.add('hidden');
+            render();
+        }
+
+        function closeConfirm() { document.getElementById('confirm-modal').classList.add('hidden'); }
+
+        // Historial
+        function openHistory() {
+            const history = getHistory(currentBooth);
+            let t = 0, tc = 0, tm = 0;
+            document.getElementById('history-list').innerHTML = history.slice().reverse().map(d => {
+                t += d.total; tc += d.cash; tm += d.mp;
+                return `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
+                    <div><p class="font-black text-xs text-slate-800">${d.date}</p><p class="text-[9px] font-bold text-slate-400 uppercase">EF: $${d.cash.toLocaleString()} | MP: $${d.mp.toLocaleString()}</p></div>
+                    <span class="font-black text-indigo-600">$${d.total.toLocaleString()}</span></div>`;
+            }).join('') || '<p class="text-center py-10 text-slate-300 uppercase text-[9px] font-bold">Sin registros</p>';
+            document.getElementById('grand-total').innerText = "$" + t.toLocaleString();
+            document.getElementById('grand-cash').innerText = "EF: $" + tc.toLocaleString();
+            document.getElementById('grand-mp').innerText = "MP: $" + tm.toLocaleString();
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        function closeHistory() { document.getElementById('history-modal').classList.add('hidden'); }
+        function closeDay() {
+            const sales = getSales(currentBooth);
+            if (sales.length === 0) return alert("No hay ventas hoy.");
+            if (confirm("¿Cerrar el día? La caja se reiniciará.")) {
+                let cash = 0, mp = 0;
+                sales.forEach(s => { if (s.method === 'cash') cash += s.totalPrice; else mp += s.totalPrice; });
+                const history = getHistory(currentBooth);
+                history.push({ date: new Date().toLocaleDateString('es-AR'), cash, mp, total: cash + mp });
+                saveState(currentBooth, getProducts(currentBooth), [], getMissing(currentBooth), history);
+                render();
+            }
+        }
+
+        // Faltantes y Reporte
+        function openMissingList() { 
+            const m = getMissing(currentBooth);
+            document.getElementById('missing-content').innerHTML = Object.entries(m).map(([n, q]) => `<div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center"><p class="text-xs font-black uppercase">${n} (x${q})</p><button onclick="resolveMissing('${n}')" class="text-emerald-500 font-black text-[9px] uppercase p-2">Repuesto</button></div>`).join('') || '<p class="text-center py-10 text-slate-300 uppercase text-[9px] font-bold">Stock completo</p>';
+            document.getElementById('missing-modal').classList.remove('hidden'); 
+        }
+        function resolveMissing(n) { const m = getMissing(currentBooth); delete m[n]; saveState(currentBooth, getProducts(currentBooth), getSales(currentBooth), m); openMissingList(); }
+        function closeMissingList() { document.getElementById('missing-modal').classList.add('hidden'); }
+        function closeReport() { document.getElementById('report-modal').classList.add('hidden'); }
+        function clearHistory() { if(confirm("¿Borrar todo el historial?")) { localStorage.removeItem(currentBooth + '_history'); openHistory(); } }
+        
+        function undoLastSale() { 
+            const s = getSales(currentBooth); 
+            if(s.length > 0 && confirm("¿Anular última venta?")) { 
+                const last = s.pop(); 
+                const m = getMissing(currentBooth); 
+                if(m[last.name]) { m[last.name] -= last.qty; if(m[last.name] <= 0) delete m[last.name]; } 
+                saveState(currentBooth, getProducts(currentBooth), s, m); 
+                render(); 
+            } 
+        }
+
+        function generateReport() {
+            const sales = getSales(currentBooth); let c = 0, m = 0, p = {};
+            sales.forEach(s => { if(s.method === 'cash') c += s.totalPrice; else m += s.totalPrice; p[s.name] = (p[s.name] || 0) + s.qty; });
+            document.getElementById('report-content').innerHTML = `
+                <div class="text-center"><h2 class="font-black text-xl mb-6 uppercase text-slate-800">Cierre de Caja</h2>
+                <div class="bg-slate-900 text-white p-8 rounded-[2.5rem] mb-6 shadow-xl"><p class="text-[9px] font-bold opacity-50 uppercase mb-1">Total</p><p class="text-5xl font-black">$${(c+m).toLocaleString()}</p></div>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-emerald-50 p-4 rounded-2xl border-2 border-emerald-100"><p class="text-[9px] font-black text-emerald-600 uppercase">Efectivo</p><p class="text-lg font-black text-emerald-700">$${c.toLocaleString()}</p></div>
+                <div class="bg-sky-50 p-4 rounded-2xl border-2 border-sky-100"><p class="text-[9px] font-black text-sky-600 uppercase">M. Pago</p><p class="text-lg font-black text-sky-700">$${m.toLocaleString()}</p></div></div>
+                <div class="text-left bg-slate-50 p-6 rounded-3xl"><p class="font-black text-[9px] text-slate-400 uppercase mb-4 border-b pb-2">Artículos</p>
+                <div class="space-y-2">${Object.entries(p).map(([n, q]) => `<div class="flex justify-between text-xs font-bold text-slate-700"><span>${n}</span><span>x${q}</span></div>`).join('')}</div></div></div>`;
+            document.getElementById('report-modal').classList.remove('hidden');
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
+
+```
