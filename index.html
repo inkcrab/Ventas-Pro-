@@ -77,7 +77,7 @@
             <button onclick="setBooth('oki')" id="tab-oki" class="flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400 transition-all">🤖 OKIEDOKIE</button>
         </nav>
 
-        <!-- Totales (Cards de colores) -->
+        <!-- Totales -->
         <div class="grid grid-cols-2 gap-3 mb-6 no-print">
             <div class="bg-[#10b981] p-5 rounded-[1.8rem] text-white card-shadow">
                 <p class="text-[9px] font-bold uppercase opacity-90 mb-1">Efectivo Real</p>
@@ -99,24 +99,20 @@
 
         <!-- Panel de Acciones Inferior -->
         <div class="bg-white p-6 rounded-[2.5rem] card-shadow border border-slate-50 no-print space-y-4 mb-10">
-            <!-- Botón Reporte Principal -->
             <button onclick="showTodayReport()" class="w-full py-4 bg-[#111827] text-white font-bold rounded-2xl flex items-center justify-center gap-2 uppercase text-xs tracking-tight">
                 📄 REPORTE CON HORARIOS
             </button>
 
-            <!-- Fila de 3 Botones -->
             <div class="grid grid-cols-3 gap-2">
                 <button onclick="openModal('stock-modal'); renderStock();" class="btn-action bg-[#f1f5f9] text-[#475569]">📦 STOCK</button>
                 <button onclick="openNotes()" class="btn-action bg-[#fffbeb] text-[#d97706]">📝 NOTAS</button>
                 <button onclick="openModal('expenses-modal')" class="btn-action bg-[#fef2f2] text-[#dc2626]">💸 GASTOS</button>
             </div>
 
-            <!-- Botón Historial -->
             <button onclick="openHistory()" class="w-full py-4 bg-[#f8fafc] text-slate-500 font-bold rounded-2xl flex items-center justify-center gap-2 uppercase text-[10px] border border-slate-100">
                 📂 HISTORIAL DE CIERRES
             </button>
 
-            <!-- Botón Cierre -->
             <button onclick="confirmCloseDay()" class="w-full py-4 bg-[#fef2f2] text-[#ef4444] font-bold rounded-2xl flex items-center justify-center gap-2 uppercase text-[10px]">
                 ⚠️ CIERRE DE CAJA
             </button>
@@ -174,7 +170,7 @@
         </div>
     </div>
 
-    <!-- Reporte de Detalle (Para hoy y para historial) -->
+    <!-- Reporte de Detalle -->
     <div id="report-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center no-print mb-8">
@@ -222,7 +218,6 @@
         let selectedProduct = null;
         let selectedQty = 1;
 
-        // Persistencia
         const db = {
             get: (key) => JSON.parse(localStorage.getItem(key)) || [],
             set: (key, val) => localStorage.setItem(key, JSON.stringify(val))
@@ -244,7 +239,6 @@
         }
 
         function render() {
-            // Calcular Totales Diarios
             let cash = 0, mp = 0;
             ['bijou', 'oki'].forEach(b => {
                 db.get(`${b}_sales`).forEach(s => { if(s.m === 'cash') cash += s.t; else mp += s.t; });
@@ -253,7 +247,6 @@
             document.getElementById('cash-display').innerText = `$${cash.toLocaleString()}`;
             document.getElementById('mp-display').innerText = `$${mp.toLocaleString()}`;
 
-            // Render Grid
             const grid = document.getElementById('products-grid');
             const prods = db.get(`${currentBooth}_products`);
             grid.innerHTML = prods.map(p => `
@@ -305,15 +298,6 @@
             render();
         }
 
-        function showTodayReport() {
-            const vB = db.get('bijou_sales'), vO = db.get('oki_sales'), gB = db.get('bijou_expenses'), gO = db.get('oki_expenses');
-            const totalCash = document.getElementById('cash-display').innerText;
-            const totalMp = document.getElementById('mp-display').innerText;
-            
-            buildReportHTML({ fecha: 'HOY', hora: 'Cierre Actual', vB, vO, gB, gO, totalCash, totalMp });
-            openModal('report-modal');
-        }
-
         function buildReportHTML(data) {
             const container = document.getElementById('report-content');
             container.innerHTML = `
@@ -324,12 +308,12 @@
                 
                 <div class="space-y-8">
                     <div>
-                        <h3 class="text-[10px] font-black text-pink-500 uppercase border-b pb-2 mb-3">✨ BIJOU</h3>
+                        <h3 class="text-[10px] font-black text-pink-500 uppercase border-b pb-2 mb-3">✨ A TU ESTILO.</h3>
                         ${data.vB.length ? data.vB.map(v => `<div class="flex justify-between text-xs font-bold py-1"><span>${v.n} x${v.q} <span class="text-[9px] text-slate-300 ml-1">${v.h}</span></span><span>$${v.t.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin ventas</p>'}
                     </div>
 
                     <div>
-                        <h3 class="text-[10px] font-black text-indigo-500 uppercase border-b pb-2 mb-3">🤖 OKI</h3>
+                        <h3 class="text-[10px] font-black text-indigo-500 uppercase border-b pb-2 mb-3">🤖 OKIEDOKIE</h3>
                         ${data.vO.length ? data.vO.map(v => `<div class="flex justify-between text-xs font-bold py-1"><span>${v.n} x${v.q} <span class="text-[9px] text-slate-300 ml-1">${v.h}</span></span><span>$${v.t.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin ventas</p>'}
                     </div>
 
@@ -352,42 +336,52 @@
             `;
         }
 
+        function showTodayReport() {
+            const vB = db.get('bijou_sales'), vO = db.get('oki_sales'), gB = db.get('bijou_expenses'), gO = db.get('oki_expenses');
+            const totalCash = document.getElementById('cash-display').innerText;
+            const totalMp = document.getElementById('mp-display').innerText;
+            buildReportHTML({ fecha: 'HOY', hora: 'Cierre Actual', vB, vO, gB, gO, totalCash, totalMp });
+            openModal('report-modal');
+        }
+
         function confirmCloseDay() {
-            if(!confirm("¿Estás seguro de cerrar el día? Se guardará en el historial y se limpiarán las ventas actuales.")) return;
+            if(!confirm("¿Cerrar día? Se guardará en historial.")) return;
+            const history = db.get('feria_history_v4');
+            const vB = db.get('bijou_sales'), vO = db.get('oki_sales');
             
-            const history = db.get('feria_history_v3');
-            const report = {
+            // Determinar nombre del cierre basado en ventas predominantes o el booth actual
+            let cierreNombre = currentBooth === 'bijou' ? '✨ A TU ESTILO.' : '🤖 OKIEDOKIE';
+            if(vB.length > 0 && vO.length === 0) cierreNombre = '✨ A TU ESTILO.';
+            if(vO.length > 0 && vB.length === 0) cierreNombre = '🤖 OKIEDOKIE';
+
+            history.unshift({
                 id: Date.now(),
+                nombre: cierreNombre,
                 fecha: new Date().toLocaleDateString(),
                 hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                vB: db.get('bijou_sales'),
-                vO: db.get('oki_sales'),
-                gB: db.get('bijou_expenses'),
+                vB, vO, 
+                gB: db.get('bijou_expenses'), 
                 gO: db.get('oki_expenses'),
                 totalCash: document.getElementById('cash-display').innerText,
                 totalMp: document.getElementById('mp-display').innerText
-            };
-
-            history.unshift(report);
-            db.set('feria_history_v3', history);
-
-            // Limpiar hoy
+            });
+            db.set('feria_history_v4', history);
             ['bijou', 'oki'].forEach(b => { db.set(`${b}_sales`, []); db.set(`${b}_expenses`, []); });
             render();
             openHistory();
         }
 
         function openHistory() {
-            const history = db.get('feria_history_v3');
+            const history = db.get('feria_history_v4');
             const container = document.getElementById('history-content');
-            
             if(!history.length) {
-                container.innerHTML = `<div class="py-20 text-center text-slate-300 font-bold uppercase text-[10px]">No hay cierres guardados</div>`;
+                container.innerHTML = `<div class="py-20 text-center text-slate-300 font-bold uppercase text-[10px]">Sin cierres</div>`;
             } else {
                 container.innerHTML = history.map(h => `
-                    <div class="history-item card-shadow ${h.vB.length > 0 ? 'history-border-bijou' : 'history-border-oki'}">
+                    <div class="history-item card-shadow ${h.nombre.includes('ESTILO') ? 'history-border-bijou' : 'history-border-oki'}">
                         <div>
-                            <p class="font-black text-xs uppercase">${h.fecha}</p>
+                            <p class="font-black text-[9px] text-slate-400 uppercase mb-0.5">${h.nombre}</p>
+                            <p class="font-black text-xs uppercase text-slate-800">${h.fecha} — ${h.hora}</p>
                             <div class="flex gap-3 mt-1 font-bold text-[11px]">
                                 <span class="text-emerald-500">E: ${h.totalCash}</span>
                                 <span class="text-sky-500">M: ${h.totalMp}</span>
@@ -405,16 +399,9 @@
             openModal('report-modal');
         }
 
-        // Notas
-        function openNotes() {
-            document.getElementById('notes-input').value = localStorage.getItem('feria_notes_text') || "";
-            openModal('notes-modal');
-        }
-        function saveNotes() {
-            localStorage.setItem('feria_notes_text', document.getElementById('notes-input').value);
-        }
+        function openNotes() { document.getElementById('notes-input').value = localStorage.getItem('feria_notes_text') || ""; openModal('notes-modal'); }
+        function saveNotes() { localStorage.setItem('feria_notes_text', document.getElementById('notes-input').value); }
 
-        // Stock
         function addNewProduct() {
             const n = document.getElementById('stock-name').value;
             const p = parseInt(document.getElementById('stock-price').value);
@@ -422,10 +409,8 @@
             const list = db.get(`${currentBooth}_products`);
             list.push({ id: Date.now(), n, p });
             db.set(`${currentBooth}_products`, list);
-            document.getElementById('stock-name').value = "";
-            document.getElementById('stock-price').value = "";
-            renderStock();
-            render();
+            document.getElementById('stock-name').value = ""; document.getElementById('stock-price').value = "";
+            renderStock(); render();
         }
         function renderStock() {
             const list = db.get(`${currentBooth}_products`);
@@ -436,26 +421,18 @@
                 </div>
             `).join('');
         }
-        function deleteProduct(id) {
-            db.set(`${currentBooth}_products`, db.get(`${currentBooth}_products`).filter(p => p.id !== id));
-            renderStock();
-            render();
-        }
+        function deleteProduct(id) { db.set(`${currentBooth}_products`, db.get(`${currentBooth}_products`).filter(p => p.id !== id)); renderStock(); render(); }
 
-        // Utilidades
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function resetToday() { if(confirm("Borrar ventas de hoy?")) { ['bijou', 'oki'].forEach(b => { db.set(`${b}_sales`, []); db.set(`${b}_expenses`, []); }); render(); closeModal('history-modal'); } }
-        function clearAllHistory() { if(confirm("Borrar TODO el historial permanentemente?")) { db.set('feria_history_v3', []); openHistory(); } }
+        function clearAllHistory() { if(confirm("¿Borrar todo el historial?")) { db.set('feria_history_v4', []); openHistory(); } }
 
         window.onload = () => {
-            // Inicializar con productos de ejemplo si está vacío
             if(db.get('bijou_products').length === 0) {
                 db.set('bijou_products', [
-                    {id:1, n:'Sorpresas x2', p:1000},
-                    {id:2, n:'Sorpresas x1', p:600},
-                    {id:3, n:'Cadenitas con Imán', p:8000},
-                    {id:4, n:'Pulsera Cadenita', p:3000}
+                    {id:1, n:'Sorpresas x2', p:1000}, {id:2, n:'Sorpresas x1', p:600},
+                    {id:3, n:'Cadenitas con Imán', p:8000}, {id:4, n:'Pulsera Cadenita', p:3000}
                 ]);
             }
             render();
