@@ -3,152 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Caja Feria - Gestión</title>
+    <title>Caja Feria - Control Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f8fafc; 
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; user-select: none; -webkit-tap-highlight-color: transparent; }
         .active-tab-estilo { border-bottom: 4px solid #db2777; color: #db2777; font-weight: 900; }
         .active-tab-oki { border-bottom: 4px solid #4f46e5; color: #4f46e5; font-weight: 900; }
-
-        .product-card {
-            background: white;
-            border-radius: 2rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 140px;
-            border: 1px solid #f1f5f9;
-        }
-
-        .history-card {
-            background: white;
-            border-radius: 2.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-left: 8px solid transparent;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-        }
-
+        .product-card { background: white; border-radius: 1.5rem; padding: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; height: 110px; border: 1px solid #f1f5f9; }
+        .history-card { background: white; border-radius: 1.5rem; padding: 1.2rem; margin-bottom: 0.8rem; border-left: 5px solid #64748b; box-shadow: 0 4px 10px rgba(0,0,0,0.04); }
         @media print { .no-print { display: none; } }
     </style>
 </head>
 <body class="pb-24">
 
     <div id="app" class="max-w-md mx-auto px-4">
-        <!-- Navegación Superior -->
+        <!-- Navegación -->
         <nav class="flex bg-white border-b sticky top-0 z-40 -mx-4 mb-6 shadow-sm no-print">
             <button onclick="switchBooth('estilo')" id="tab-estilo" class="flex-1 py-4 text-[10px] uppercase active-tab-estilo tracking-tight">✨ A TU ESTILO.</button>
             <button onclick="switchBooth('oki')" id="tab-oki" class="flex-1 py-4 text-[10px] uppercase text-slate-400 tracking-tight">🤖 OKIEDOKIE</button>
         </nav>
 
-        <!-- Indicadores de Dinero -->
+        <!-- Dinero en Caja -->
         <div class="grid grid-cols-2 gap-4 mb-6 no-print">
-            <div class="bg-[#10b981] p-6 rounded-[2.5rem] text-white shadow-lg">
-                <p class="text-[9px] font-black uppercase opacity-80 tracking-widest mb-1">Efectivo Real</p>
-                <p id="total-cash" class="text-2xl font-extrabold">$0</p>
+            <div class="bg-[#10b981] p-5 rounded-[2rem] text-white shadow-lg">
+                <p class="text-[8px] font-black uppercase opacity-80 tracking-widest mb-1">Efectivo Hoy</p>
+                <p id="total-cash" class="text-xl font-extrabold">$0</p>
             </div>
-            <div class="bg-[#0ea5e9] p-6 rounded-[2.5rem] text-white shadow-lg">
-                <p class="text-[9px] font-black uppercase opacity-80 tracking-widest mb-1">M. Pago Real</p>
-                <p id="total-mp" class="text-2xl font-extrabold">$0</p>
+            <div class="bg-[#0ea5e9] p-5 rounded-[2rem] text-white shadow-lg">
+                <p class="text-[8px] font-black uppercase opacity-80 tracking-widest mb-1">M. Pago Hoy</p>
+                <p id="total-mp" class="text-xl font-extrabold">$0</p>
             </div>
         </div>
 
-        <!-- Buscador -->
-        <div class="mb-6 no-print">
-            <input type="text" id="search-input" oninput="render()" placeholder="🔍 Buscar producto..." 
-                class="w-full p-5 bg-white border border-slate-100 rounded-[1.5rem] font-bold shadow-sm outline-none text-sm">
-        </div>
+        <!-- Productos -->
+        <div id="products-grid" class="grid grid-cols-2 gap-3 mb-8"></div>
 
-        <!-- Cuadrícula de Productos -->
-        <div id="products-grid" class="grid grid-cols-2 gap-4 mb-8"></div>
-
-        <!-- Panel de Acciones -->
-        <div class="bg-white p-6 rounded-[3rem] shadow-xl border border-slate-50 no-print space-y-4">
-            <button onclick="generateReport()" class="w-full py-5 bg-[#1e293b] text-white font-black rounded-2xl shadow-lg uppercase text-xs">📄 Reporte con Horarios</button>
-            
+        <!-- Botones de Acción -->
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-50 no-print space-y-4">
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="openConfig()" class="py-4 bg-[#f1f5f9] text-[#475569] font-black rounded-xl uppercase text-[9px]">📦 Stock</button>
-                <button onclick="openNotes()" class="py-4 bg-[#fff7ed] text-[#9a3412] font-black rounded-xl uppercase text-[9px]">📝 Notas</button>
-                <button onclick="openExpenses()" class="py-4 bg-[#fef2f2] text-[#991b1b] font-black rounded-xl uppercase text-[9px]">💸 Gastos</button>
+                <button onclick="openConfig()" class="py-4 bg-slate-100 text-slate-600 font-black rounded-2xl uppercase text-[9px]">📦 Stock</button>
+                <button onclick="openExpenses()" class="py-4 bg-red-50 text-red-600 font-black rounded-2xl uppercase text-[9px]">💸 Gastos</button>
+                <button onclick="openNotes()" class="py-4 bg-amber-50 text-amber-600 font-black rounded-2xl uppercase text-[9px]">📝 Notas</button>
             </div>
-
-            <button onclick="openHistory()" class="w-full py-4 bg-slate-50 text-slate-400 font-black rounded-2xl uppercase text-[10px] tracking-widest">📂 Historial de Cierres</button>
-
-            <button onclick="handleCloseDay()" class="w-full py-5 bg-red-50 text-red-600 font-black rounded-2xl border border-red-100 uppercase text-xs tracking-wider">
-                ⚠️ CIERRE DE CAJA
-            </button>
+            <button onclick="openHistory()" class="w-full py-4 bg-indigo-50 text-indigo-600 font-black rounded-2xl uppercase text-[10px] tracking-widest">📂 Ver Historial de Cierres</button>
+            <button onclick="handleCloseDay()" class="w-full py-5 bg-red-600 text-white font-black rounded-2xl shadow-lg uppercase text-xs">⚠️ Cerrar Caja del Día</button>
         </div>
     </div>
 
-    <!-- MODAL: GASTOS (Asociados al puesto actual) -->
-    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+    <!-- MODAL: NOTAS (RECUPERADO) -->
+    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="font-black uppercase text-[10px] tracking-widest text-red-400">💸 Gastos</h2>
-                <button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button>
+                <h2 class="font-black uppercase text-xs text-amber-600">Bloc de Notas / Pendientes</h2>
+                <button onclick="closeModal('notes-modal')" class="text-2xl">✕</button>
             </div>
-            <div class="bg-red-50 p-6 rounded-[2.5rem] mb-8 border border-red-100">
-                <p id="expense-booth-label" class="text-[8px] font-black uppercase text-red-300 mb-4 tracking-tighter text-center"></p>
-                <input id="exp-name" type="text" placeholder="Concepto" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white outline-none">
-                <input id="exp-price" type="number" placeholder="Monto ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white outline-none">
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="saveExpense('cash')" class="py-4 bg-[#10b981] text-white font-black rounded-xl uppercase text-[9px]">Efectivo</button>
-                    <button onclick="saveExpense('mp')" class="py-4 bg-[#0ea5e9] text-white font-black rounded-xl uppercase text-[9px]">M. Pago</button>
-                </div>
-            </div>
-            <div id="expenses-list" class="space-y-2"></div>
+            <textarea id="notes-input" placeholder="Escribe aquí notas, pedidos o deudas..." class="w-full h-48 p-4 bg-amber-50 border border-amber-100 rounded-3xl font-bold text-sm outline-none mb-4" oninput="saveNotes()"></textarea>
+            <p class="text-[9px] text-amber-400 font-black uppercase text-center">Se guarda automáticamente al escribir</p>
         </div>
     </div>
 
     <!-- MODAL: HISTORIAL -->
-    <div id="history-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
+    <div id="history-modal" class="hidden fixed inset-0 bg-slate-50 z-[200] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 tracking-widest">📂 Historial de Cierres</h2>
-                <button onclick="closeModal('history-modal')" class="text-2xl">✕</button>
+                <h2 class="font-black uppercase text-xs tracking-widest text-slate-500">Historial de Cierres</h2>
+                <button onclick="closeModal('history-modal')" class="text-2xl font-bold bg-white w-10 h-10 rounded-full shadow-sm">✕</button>
             </div>
-            
-            <div id="history-list" class="space-y-4 mb-10"></div>
+            <div id="history-list" class="space-y-4"></div>
+            <button onclick="clearHistory()" class="mt-12 w-full py-4 text-red-400 font-bold text-[10px] uppercase border border-red-100 rounded-2xl">Borrar Todo el Historial</button>
+        </div>
+    </div>
 
-            <!-- ZONA DE PELIGRO -->
-            <div class="mt-20 p-8 bg-red-50 rounded-[3rem] border border-red-100 space-y-4">
-                <p class="text-[9px] font-black text-red-400 uppercase tracking-widest text-center mb-2">Zona de Peligro</p>
-                <button onclick="resetCurrentDay()" class="w-full py-4 bg-white text-red-600 border border-red-200 font-black rounded-2xl uppercase text-[10px]">Restablecer Ventas de Hoy</button>
-                <button onclick="resetFullHistory()" class="w-full py-4 bg-red-600 text-white font-black rounded-2xl uppercase text-[10px] shadow-lg shadow-red-100">Borrar todo el Historial</button>
+    <!-- MODAL: DETALLE DEL CIERRE -->
+    <div id="detail-modal" class="hidden fixed inset-0 bg-white z-[250] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between mb-8 items-center no-print">
+                <button onclick="closeModal('detail-modal')" class="font-black text-slate-400 text-[10px] uppercase">✕ Volver</button>
+                <button onclick="window.print()" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-[10px] font-black">IMPRIMIR</button>
+            </div>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: VENTA -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-end justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 shadow-2xl text-center">
+            <h3 id="confirm-name" class="font-black uppercase text-slate-800 mb-6"></h3>
+            <div class="flex justify-center gap-6 mb-8 items-center">
+                <button onclick="modQty(-1)" class="w-12 h-12 bg-slate-100 rounded-full text-xl font-bold">−</button>
+                <span id="confirm-qty" class="text-3xl font-black">1</span>
+                <button onclick="modQty(1)" class="w-12 h-12 bg-slate-100 rounded-full text-xl font-bold">+</button>
+            </div>
+            <div class="grid gap-3">
+                <button onclick="doSale('cash')" class="py-5 bg-emerald-500 text-white font-black rounded-2xl uppercase text-xs">Efectivo</button>
+                <button onclick="doSale('mp')" class="py-5 bg-sky-500 text-white font-black rounded-2xl uppercase text-xs">Mercado Pago</button>
+                <button onclick="closeModal('confirm-modal')" class="py-3 text-slate-400 font-bold text-[10px] uppercase">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <!-- OTROS MODALES (Stock, Notas, Reporte) -->
-    <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-[3.5rem] p-8 shadow-2xl">
-            <h3 id="confirm-item-name" class="text-lg font-black text-slate-800 mb-4 uppercase text-center">Producto</h3>
-            <div class="flex items-center justify-center gap-8 mb-8"><button onclick="updateQty(-1)" class="w-14 h-14 bg-slate-50 rounded-full font-bold text-2xl border border-slate-100">−</button><span id="confirm-qty" class="text-4xl font-black text-slate-900">1</span><button onclick="updateQty(1)" class="w-14 h-14 bg-slate-50 rounded-full font-bold text-2xl border border-slate-100">+</button></div>
-            <div class="bg-indigo-50 rounded-[2rem] p-6 mb-8 text-center border border-indigo-100"><p id="confirm-total" class="text-4xl font-black text-indigo-600">$0</p></div>
-            <div class="grid gap-3"><button onclick="confirmSale('cash')" class="w-full py-5 bg-[#10b981] text-white font-black rounded-2xl uppercase text-xs">Efectivo</button><button onclick="confirmSale('mp')" class="w-full py-5 bg-[#0ea5e9] text-white font-black rounded-2xl uppercase text-xs">Mercado Pago</button><button onclick="closeModal('confirm-modal')" class="py-2 text-slate-400 font-bold text-[10px] uppercase text-center w-full">Cancelar</button></div>
+    <!-- MODAL GASTOS -->
+    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[150] p-6">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-black uppercase text-xs text-red-500">Registrar Gasto</h2>
+                <button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button>
+            </div>
+            <div class="space-y-4">
+                <input id="exp-desc" type="text" placeholder="Concepto (ej: Comida)" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
+                <input id="exp-amt" type="number" placeholder="Monto $" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
+                <div class="grid grid-cols-2 gap-4 pt-4">
+                    <button onclick="addExp('cash')" class="py-4 bg-emerald-500 text-white font-black rounded-xl text-[10px] uppercase">Efectivo</button>
+                    <button onclick="addExp('mp')" class="py-4 bg-sky-500 text-white font-black rounded-xl text-[10px] uppercase">M. Pago</button>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="config-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto"><div class="max-w-md mx-auto"><div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400">📦 Gestión Stock</h2><button onclick="closeModal('config-modal')" class="text-2xl">✕</button></div><div class="bg-slate-50 p-6 rounded-[2rem] mb-8 border border-slate-100"><input id="in-name" type="text" placeholder="Nombre" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white outline-none"><input id="in-price" type="number" placeholder="Precio ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white outline-none"><button onclick="saveProduct()" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl uppercase text-xs">Añadir Producto</button></div><div id="edit-list" class="space-y-1"></div></div></div>
-    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto"><div class="max-w-md mx-auto"><div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-orange-400">📝 Notas</h2><button onclick="closeModal('notes-modal')" class="text-2xl">✕</button></div><textarea id="notes-area" oninput="saveNotes()" class="w-full h-[60vh] p-8 bg-orange-50 rounded-[3rem] font-bold text-slate-700 outline-none border-none resize-none placeholder-orange-200" placeholder="Anota algo..."></textarea></div></div>
-    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[250] p-6 overflow-y-auto"><div class="max-w-md mx-auto"><div class="flex justify-between mb-8 no-print items-center"><button onclick="closeModal('report-modal')" class="font-black text-slate-400 text-[10px] uppercase">✕ Cerrar</button><button onclick="window.print()" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase">Imprimir</button></div><div id="report-content"></div></div></div>
+
+    <!-- MODAL STOCK -->
+    <div id="config-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-black uppercase text-xs">Gestionar Productos</h2>
+                <button onclick="closeModal('config-modal')" class="text-2xl">✕</button>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-3xl mb-8">
+                <input id="new-name" type="text" placeholder="Nombre" class="w-full p-4 rounded-xl mb-3 font-bold outline-none">
+                <input id="new-price" type="number" placeholder="Precio $" class="w-full p-4 rounded-xl mb-4 font-bold outline-none">
+                <button onclick="addProduct()" class="w-full py-4 bg-black text-white font-black rounded-xl uppercase text-[10px]">Añadir Producto</button>
+            </div>
+            <div id="stock-list" class="space-y-2"></div>
+        </div>
+    </div>
 
     <script>
         let currentBooth = 'estilo';
-        let pendingItem = null;
-        let currentQty = 1;
+        let selProduct = null;
+        let selQty = 1;
 
-        const getSafe = (k) => { try { return JSON.parse(localStorage.getItem(k)) || []; } catch(e) { return []; } };
+        const load = (key) => {
+            const data = localStorage.getItem(key);
+            if (!data) return [];
+            try { return JSON.parse(data); } catch(e) { return []; }
+        };
+        const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
         function switchBooth(b) {
             currentBooth = b;
@@ -160,191 +159,122 @@
         function render() {
             let cash = 0, mp = 0;
             ['estilo', 'oki'].forEach(p => {
-                getSafe(p + '_sales').forEach(s => {
-                    if(s.method === 'cash') cash += s.totalPrice;
-                    else mp += s.totalPrice;
-                });
-                getSafe(p + '_expenses').forEach(e => {
-                    if(e.method === 'cash') cash -= e.amount;
-                    else mp -= e.amount;
-                });
+                load(p + '_v').forEach(v => { if(v.m === 'cash') cash += v.t; else mp += v.t; });
+                load(p + '_g').forEach(g => { if(g.m === 'cash') cash -= g.a; else mp -= g.a; });
             });
-
             document.getElementById('total-cash').innerText = "$" + cash.toLocaleString();
             document.getElementById('total-mp').innerText = "$" + mp.toLocaleString();
-
-            const search = document.getElementById('search-input').value.toLowerCase();
-            document.getElementById('products-grid').innerHTML = getSafe(currentBooth + '_products')
-                .filter(p => p.name.toLowerCase().includes(search))
-                .map(p => `
-                    <button onclick="askConfirmation(${p.id})" class="product-card">
-                        <h4 class="font-black text-[10px] uppercase text-slate-700 leading-tight">${p.name}</h4>
-                        <p class="text-[#4f46e5] font-black text-sm">$${p.price.toLocaleString()}</p>
-                    </button>
-                `).join('');
+            const grid = document.getElementById('products-grid');
+            const prods = load(currentBooth + '_p');
+            grid.innerHTML = prods.map(p => `
+                <button onclick="openSale(${p.id})" class="product-card">
+                    <span class="text-[10px] font-black uppercase text-slate-500">${p.n}</span>
+                    <span class="text-indigo-600 font-black">$${p.p.toLocaleString()}</span>
+                </button>
+            `).join('');
         }
 
-        function askConfirmation(id) {
-            pendingItem = getSafe(currentBooth + '_products').find(p => p.id === id);
-            currentQty = 1; updateQtyDisplay();
-            document.getElementById('confirm-item-name').innerText = pendingItem.name;
+        function openSale(id) {
+            selProduct = load(currentBooth + '_p').find(p => p.id === id);
+            selQty = 1;
+            document.getElementById('confirm-name').innerText = selProduct.n;
+            document.getElementById('confirm-qty').innerText = "1";
             document.getElementById('confirm-modal').classList.remove('hidden');
         }
-        function updateQty(v) { currentQty = Math.max(1, currentQty + v); updateQtyDisplay(); }
-        function updateQtyDisplay() {
-            document.getElementById('confirm-qty').innerText = currentQty;
-            document.getElementById('confirm-total').innerText = "$" + (pendingItem.price * currentQty).toLocaleString();
-        }
-        function confirmSale(method) {
-            const sales = getSafe(currentBooth + '_sales');
-            sales.push({ id: Date.now(), name: pendingItem.name, qty: currentQty, totalPrice: pendingItem.price * currentQty, method, hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
-            localStorage.setItem(currentBooth + '_sales', JSON.stringify(sales));
-            closeModal('confirm-modal'); render();
+        function modQty(v) { selQty = Math.max(1, selQty + v); document.getElementById('confirm-qty').innerText = selQty; }
+        function doSale(m) {
+            const list = load(currentBooth + '_v');
+            list.push({ id: Date.now(), n: selProduct.n, q: selQty, t: selProduct.p * selQty, m, h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+            save(currentBooth + '_v', list);
+            closeModal('confirm-modal');
+            render();
         }
 
-        // Gastos
-        function openExpenses() {
-            document.getElementById('expense-booth-label').innerText = "CARGANDO A: " + (currentBooth === 'estilo' ? 'A TU ESTILO' : 'OKIEDOKIE');
-            document.getElementById('expenses-modal').classList.remove('hidden');
-            renderExp();
-        }
-        function saveExpense(method) {
-            const n = document.getElementById('exp-name').value, p = parseInt(document.getElementById('exp-price').value);
-            if(!n || !p) return;
-            const exps = getSafe(currentBooth + '_expenses');
-            exps.push({ id: Date.now(), name: n, amount: p, method });
-            localStorage.setItem(currentBooth + '_expenses', JSON.stringify(exps));
-            document.getElementById('exp-name').value = ""; document.getElementById('exp-price').value = "";
-            renderExp(); render();
-        }
-        function renderExp() {
-            document.getElementById('expenses-list').innerHTML = getSafe(currentBooth + '_expenses').map(e => `
-                <div class="flex justify-between p-4 bg-red-50 rounded-2xl text-[10px] font-bold text-red-800 uppercase">
-                    <span>${e.name} (${e.method === 'cash' ? 'Efectivo' : 'M. Pago'})</span><span>-$${e.amount}</span>
-                </div>
-            `).join('') || '<p class="text-center text-[10px] text-slate-300 font-bold uppercase mt-4">Sin gastos</p>';
+        function addExp(m) {
+            const d = document.getElementById('exp-desc').value, a = parseInt(document.getElementById('exp-amt').value);
+            if(!d || !a) return;
+            const list = load(currentBooth + '_g');
+            list.push({ id: Date.now(), d, a, m });
+            save(currentBooth + '_g', list);
+            document.getElementById('exp-desc').value = ""; document.getElementById('exp-amt').value = "";
+            closeModal('expenses-modal');
+            render();
         }
 
-        // --- CIERRE DE CAJA (CORREGIDO) ---
         function handleCloseDay() {
-            const sE = getSafe('estilo_sales'), sO = getSafe('oki_sales');
-            const gE = getSafe('estilo_expenses'), gO = getSafe('oki_expenses');
-            
-            // Si hay CUALQUIER cosa cargada, permitimos el cierre
-            const hasData = sE.length > 0 || sO.length > 0 || gE.length > 0 || gO.length > 0;
-            
-            if (!hasData) return alert("No hay ventas ni gastos registrados para cerrar.");
-
-            if (confirm("¿Cerrar el día y guardar en el historial?")) {
-                const now = new Date();
-                const closure = {
-                    id: Date.now(),
-                    fecha: now.toLocaleDateString(),
-                    hora: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                    estilo: sE, oki: sO,
-                    estiloExps: gE, okiExps: gO,
-                    totalCash: document.getElementById('total-cash').innerText,
-                    totalMp: document.getElementById('total-mp').innerText
-                };
-
-                const history = getSafe('feria_history');
-                history.unshift(closure);
-                localStorage.setItem('feria_history', JSON.stringify(history));
-
-                // Limpiar datos actuales
-                ['estilo', 'oki'].forEach(p => {
-                    localStorage.setItem(p + '_sales', '[]');
-                    localStorage.setItem(p + '_expenses', '[]');
-                });
-                localStorage.setItem('feria_notes', "");
+            const vE = load('estilo_v'), vO = load('oki_v'), gE = load('estilo_g'), gO = load('oki_g');
+            if (vE.length === 0 && vO.length === 0 && gE.length === 0 && gO.length === 0) return alert("Sin movimientos.");
+            if(confirm("¿Cerrar caja? Se guardará en historial.")) {
+                const history = load('feria_history_v2');
+                history.unshift({ id: Date.now(), fecha: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), vE, vO, gE, gO, totalE: document.getElementById('total-cash').innerText, totalM: document.getElementById('total-mp').innerText });
+                save('feria_history_v2', history);
+                ['estilo', 'oki'].forEach(p => { save(p + '_v', []); save(p + '_g', []); });
                 render();
-                alert("¡Día guardado en el historial!");
-                openHistory(); // Abrir historial automáticamente para ver el resultado
+                openHistory();
             }
         }
 
         function openHistory() {
-            const history = getSafe('feria_history');
-            document.getElementById('history-list').innerHTML = history.map(h => {
-                let label = "CIERRE MIXTO";
-                let color = "border-slate-300";
-                const hasEstilo = h.estilo.length > 0 || h.estiloExps.length > 0;
-                const hasOki = h.oki.length > 0 || h.okiExps.length > 0;
-
-                if (hasEstilo && !hasOki) { label = "CIERRE: A TU ESTILO ✨"; color = "border-pink-400"; }
-                else if (hasOki && !hasEstilo) { label = "CIERRE: OKIDOKIE 🤖"; color = "border-indigo-400"; }
-
-                return `
-                <div class="history-card ${color}">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-[10px] font-black text-slate-800 uppercase tracking-tight">${label}</p>
-                            <p class="text-[9px] font-bold text-slate-400 mt-1">${h.fecha} — ${h.hora}</p>
-                        </div>
-                        <button onclick='viewHistoryDetail(${JSON.stringify(h)})' class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase">Detalle</button>
-                    </div>
-                    <div class="flex gap-4 mt-4 border-t pt-3 border-slate-50">
-                        <span class="text-[11px] font-black text-emerald-500">${h.totalCash}</span>
-                        <span class="text-[11px] font-black text-sky-500">${h.totalMp}</span>
+            const history = load('feria_history_v2');
+            const list = document.getElementById('history-list');
+            list.innerHTML = history.length === 0 ? '<div class="text-center py-20 text-slate-300 font-bold uppercase text-[10px]">Vacío</div>' : history.map(h => `
+                <div class="history-card" onclick='showDetail(${JSON.stringify(h)})'>
+                    <div class="flex justify-between items-center">
+                        <div><p class="text-[11px] font-black uppercase">${h.fecha}</p><p class="text-[9px] text-slate-400 font-bold">${h.hora}</p></div>
+                        <div class="text-right"><p class="text-[11px] font-black text-emerald-500">${h.totalE}</p><p class="text-[11px] font-black text-sky-500">${h.totalM}</p></div>
                     </div>
                 </div>
-                `;
-            }).join('') || '<p class="text-center py-20 text-slate-300 font-black uppercase text-[10px]">No hay cierres guardados</p>';
+            `).join('');
             document.getElementById('history-modal').classList.remove('hidden');
         }
 
-        function viewHistoryDetail(h) {
-            let html = `
-                <div class="text-center mb-8"><h2 class="font-black text-xl uppercase tracking-tighter">${h.fecha}</h2><p class="text-[9px] text-slate-400 font-bold uppercase">Hora: ${h.hora}</p></div>
-                <div class="space-y-6">
-                    <div>
-                        <p class="text-[9px] font-black text-pink-500 border-b pb-1 mb-2 uppercase">✨ A TU ESTILO</p>
-                        ${h.estilo.length ? h.estilo.map(s => `<div class="flex justify-between text-[11px] py-1"><span>${s.name} x${s.qty}</span><span class="font-black">$${s.totalPrice}</span></div>`).join('') : '<p class="text-[10px] text-slate-300">Sin ventas</p>'}
-                        ${h.estiloExps?.map(e => `<div class="flex justify-between text-[10px] py-1 text-red-400 italic"><span>Gasto: ${e.name}</span><span class="font-bold">-$${e.amount}</span></div>`).join('') || ''}
-                    </div>
-                    <div>
-                        <p class="text-[9px] font-black text-indigo-500 border-b pb-1 mb-2 uppercase">🤖 OKIDOKIE</p>
-                        ${h.oki.length ? h.oki.map(s => `<div class="flex justify-between text-[11px] py-1"><span>${s.name} x${s.qty}</span><span class="font-black">$${s.totalPrice}</span></div>`).join('') : '<p class="text-[10px] text-slate-300">Sin ventas</p>'}
-                        ${h.okiExps?.map(e => `<div class="flex justify-between text-[10px] py-1 text-red-400 italic"><span>Gasto: ${e.name}</span><span class="font-bold">-$${e.amount}</span></div>`).join('') || ''}
-                    </div>
+        function showDetail(h) {
+            document.getElementById('detail-content').innerHTML = `
+                <div class="text-center border-b pb-6 mb-6">
+                    <h2 class="text-xl font-black uppercase">Resumen ${h.fecha}</h2>
                 </div>
-                <div class="mt-8 p-7 bg-slate-900 rounded-[2.5rem] text-white text-[12px] font-black uppercase shadow-2xl">
-                    <p class="flex justify-between mb-2"><span>Efectivo:</span> <span class="text-emerald-400">${h.totalCash}</span></p>
-                    <p class="flex justify-between"><span>M. Pago:</span> <span class="text-sky-400">${h.totalMp}</span></p>
+                <div class="space-y-6 text-[11px]">
+                    <div><p class="font-black text-pink-500 border-b mb-2">A TU ESTILO</p>${h.vE.map(v => `<div class="flex justify-between"><span>${v.n} x${v.q}</span><span>$${v.t}</span></div>`).join('') || 'Sin ventas'}</div>
+                    <div><p class="font-black text-indigo-500 border-b mb-2">OKIEDOKIE</p>${h.vO.map(v => `<div class="flex justify-between"><span>${v.n} x${v.q}</span><span>$${v.t}</span></div>`).join('') || 'Sin ventas'}</div>
                 </div>
-            `;
-            document.getElementById('report-content').innerHTML = html;
-            document.getElementById('report-modal').classList.remove('hidden');
+                <div class="mt-8 p-6 bg-slate-900 rounded-3xl text-white font-black">
+                    <div class="flex justify-between mb-2"><span>EFECTIVO:</span><span class="text-emerald-400">${h.totalE}</span></div>
+                    <div class="flex justify-between"><span>M. PAGO:</span><span class="text-sky-400">${h.totalM}</span></div>
+                </div>`;
+            document.getElementById('detail-modal').classList.remove('hidden');
         }
 
-        function generateReport() {
-            const h = { fecha: "Reporte Hoy", hora: "Parcial", estilo: getSafe('estilo_sales'), oki: getSafe('oki_sales'), estiloExps: getSafe('estilo_expenses'), okiExps: getSafe('oki_expenses'), totalCash: document.getElementById('total-cash').innerText, totalMp: document.getElementById('total-mp').innerText };
-            viewHistoryDetail(h);
+        // Lógica de Notas
+        function openNotes() {
+            document.getElementById('notes-input').value = localStorage.getItem('feria_notes') || "";
+            document.getElementById('notes-modal').classList.remove('hidden');
+        }
+        function saveNotes() {
+            localStorage.setItem('feria_notes', document.getElementById('notes-input').value);
         }
 
-        // Auxiliares adicionales
-        function openConfig() { document.getElementById('config-modal').classList.remove('hidden'); renderEditList(); }
-        function saveProduct() {
-            const n = document.getElementById('in-name').value, p = parseInt(document.getElementById('in-price').value);
+        function openExpenses() { document.getElementById('expenses-modal').classList.remove('hidden'); }
+        function openConfig() { document.getElementById('config-modal').classList.remove('hidden'); renderStock(); }
+        function addProduct() {
+            const n = document.getElementById('new-name').value, p = parseInt(document.getElementById('new-price').value);
             if(!n || !p) return;
-            const items = getSafe(currentBooth + '_products');
-            items.push({ id: Date.now(), name: n, price: p });
-            localStorage.setItem(currentBooth + '_products', JSON.stringify(items));
-            document.getElementById('in-name').value = ""; document.getElementById('in-price').value = "";
-            renderEditList(); render();
+            const list = load(currentBooth + '_p');
+            list.push({ id: Date.now(), n, p });
+            save(currentBooth + '_p', list);
+            document.getElementById('new-name').value = ""; document.getElementById('new-price').value = "";
+            renderStock(); render();
         }
-        function renderEditList() {
-            document.getElementById('edit-list').innerHTML = getSafe(currentBooth + '_products').map(p => `<div class="flex justify-between p-4 bg-slate-50 rounded-2xl mb-2"><div class="text-[10px] font-black uppercase"><p>${p.name}</p><p class="text-indigo-500">$${p.price}</p></div><button onclick="deleteProduct(${p.id})" class="text-red-400 font-black text-[9px]">Borrar</button></div>`).join('');
+        function renderStock() {
+            document.getElementById('stock-list').innerHTML = load(currentBooth + '_p').map(p => `
+                <div class="flex justify-between p-4 bg-slate-50 rounded-2xl items-center mb-1">
+                    <div><p class="text-[10px] font-black uppercase">${p.n}</p><p class="text-indigo-500 font-bold">$${p.p}</p></div>
+                    <button onclick="delProd(${p.id})" class="text-red-400 font-bold">✕</button>
+                </div>`).join('');
         }
-        function deleteProduct(id) {
-            localStorage.setItem(currentBooth + '_products', JSON.stringify(getSafe(currentBooth + '_products').filter(i => i.id !== id)));
-            renderEditList(); render();
-        }
-        function resetCurrentDay() { if(confirm("Borrar ventas actuales?")) { ['estilo', 'oki'].forEach(p => { localStorage.setItem(p + '_sales', '[]'); localStorage.setItem(p + '_expenses', '[]'); }); render(); } }
-        function resetFullHistory() { if(confirm("Borrar todo el historial?")) { localStorage.setItem('feria_history', '[]'); openHistory(); } }
-        function openNotes() { document.getElementById('notes-area').value = localStorage.getItem('feria_notes') || ""; document.getElementById('notes-modal').classList.remove('hidden'); }
-        function saveNotes() { localStorage.setItem('feria_notes', document.getElementById('notes-area').value); }
+        function delProd(id) { const list = load(currentBooth + '_p').filter(p => p.id !== id); save(currentBooth + '_p', list); renderStock(); render(); }
+        function clearHistory() { if(confirm("¿Borrar historial?")) { save('feria_history_v2', []); openHistory(); } }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
         window.onload = render;
     </script>
 </body>
