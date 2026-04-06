@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Caja Feria - Gestión Total</title>
+    <title>Caja Feria - Versión Final Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
@@ -48,20 +48,20 @@
 <body class="pb-24">
 
     <div id="app" class="max-w-md mx-auto px-4">
-        <!-- Navegación de Puestos -->
+        <!-- Navegación -->
         <nav class="flex bg-white border-b sticky top-0 z-40 -mx-4 mb-6 shadow-sm no-print">
             <button onclick="switchBooth('bijou')" id="tab-bijou" class="flex-1 py-4 text-[10px] font-black uppercase active-tab-bijou tracking-tight">✨ A TU ESTILO.</button>
             <button onclick="switchBooth('okidokie')" id="tab-okidokie" class="flex-1 py-4 text-[10px] font-black uppercase text-slate-400 tracking-tight">🤖 OKIEDOKIE</button>
         </nav>
 
-        <!-- Bloques de Totales (Diseño original) -->
+        <!-- Totales -->
         <div class="grid grid-cols-2 gap-4 mb-6 no-print">
             <div class="bg-[#10b981] p-6 rounded-[1.8rem] text-white shadow-lg">
-                <p class="text-[9px] font-black uppercase opacity-80 tracking-widest mb-1">Efectivo en Caja</p>
+                <p class="text-[9px] font-black uppercase opacity-80 tracking-widest mb-1">Efectivo Hoy</p>
                 <p id="total-cash" class="text-2xl font-extrabold">$0</p>
             </div>
             <div class="bg-[#0ea5e9] p-6 rounded-[1.8rem] text-white shadow-lg">
-                <p class="text-[9px] font-black uppercase opacity-80 tracking-widest mb-1">Mercado Pago</p>
+                <p class="text-[9px] font-black uppercase opacity-80 tracking-widest mb-1">M. Pago Hoy</p>
                 <p id="total-mp" class="text-2xl font-extrabold">$0</p>
             </div>
         </div>
@@ -72,12 +72,12 @@
                 class="w-full p-5 bg-white border border-slate-100 rounded-[1.5rem] font-bold shadow-sm outline-none text-sm">
         </div>
 
-        <!-- Rejilla de Productos -->
+        <!-- Productos -->
         <div id="products-grid" class="grid grid-cols-2 gap-4 mb-8"></div>
 
-        <!-- Panel de Control Inferior -->
+        <!-- Panel de Control -->
         <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-50 no-print space-y-4">
-            <button onclick="generateReport()" class="w-full py-5 bg-[#1e293b] text-white font-black rounded-2xl shadow-lg uppercase text-xs">📄 Ventas y Reporte</button>
+            <button onclick="generateReport()" class="w-full py-5 bg-[#1e293b] text-white font-black rounded-2xl shadow-lg uppercase text-xs">📄 Ver Ventas de Hoy</button>
             
             <div class="grid grid-cols-3 gap-2">
                 <button onclick="openConfig()" class="py-4 bg-[#f1f5f9] text-[#475569] font-black rounded-xl uppercase text-[9px]">📦 Stock</button>
@@ -85,18 +85,21 @@
                 <button onclick="openExpenses()" class="py-4 bg-[#fef2f2] text-[#991b1b] font-black rounded-xl uppercase text-[9px]">💸 Gastos</button>
             </div>
 
-            <!-- Botón Cerrar Caja -->
-            <button onclick="forceReset()" class="w-full py-5 bg-red-600 text-white font-black rounded-2xl shadow-lg uppercase text-xs tracking-wider flex items-center justify-center gap-2">
-                🔐 Cerrar Caja / Finalizar Día
+            <button onclick="openHistory()" class="w-full py-4 bg-slate-100 text-slate-600 font-black rounded-2xl uppercase text-[10px] tracking-widest">📂 Historial de Días</button>
+
+            <button onclick="handleCloseDay()" class="w-full py-5 bg-red-600 text-white font-black rounded-2xl shadow-lg uppercase text-xs tracking-wider">
+                🔐 CERRAR DÍA Y GUARDAR REGISTRO
             </button>
         </div>
     </div>
 
-    <!-- Modal Venta -->
+    <!-- MODALES -->
+
+    <!-- Venta -->
     <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 shadow-2xl">
-            <h3 id="confirm-item-name" class="text-lg font-black text-slate-800 mb-1 uppercase text-center">Producto</h3>
-            <div class="flex items-center justify-center gap-8 my-8">
+            <h3 id="confirm-item-name" class="text-lg font-black text-slate-800 mb-4 uppercase text-center">Producto</h3>
+            <div class="flex items-center justify-center gap-8 mb-8">
                 <button onclick="updateQty(-1)" class="w-14 h-14 bg-slate-50 rounded-full font-bold text-2xl border border-slate-100">−</button>
                 <span id="confirm-qty" class="text-4xl font-black text-slate-900">1</span>
                 <button onclick="updateQty(1)" class="w-14 h-14 bg-slate-50 rounded-full font-bold text-2xl border border-slate-100">+</button>
@@ -105,53 +108,66 @@
                 <p id="confirm-total" class="text-4xl font-black text-indigo-600">$0</p>
             </div>
             <div class="grid gap-3">
-                <button onclick="confirmSale('cash')" class="w-full py-5 bg-[#10b981] text-white font-black rounded-2xl uppercase text-xs">Venta Efectivo</button>
-                <button onclick="confirmSale('mp')" class="w-full py-5 bg-[#0ea5e9] text-white font-black rounded-2xl uppercase text-xs">Venta Mercado Pago</button>
+                <button onclick="confirmSale('cash')" class="w-full py-5 bg-[#10b981] text-white font-black rounded-2xl uppercase text-xs">Efectivo</button>
+                <button onclick="confirmSale('mp')" class="w-full py-5 bg-[#0ea5e9] text-white font-black rounded-2xl uppercase text-xs">Mercado Pago</button>
                 <button onclick="closeModal('confirm-modal')" class="py-2 text-slate-400 font-bold text-[10px] uppercase">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Gestionar Productos -->
-    <div id="config-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto no-print">
+    <!-- Gestión Stock -->
+    <div id="config-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400">📦 Gestión de Stock</h2>
-                <button onclick="closeModal('config-modal')" class="text-2xl text-slate-300">✕</button>
+            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400">📦 Gestión Stock</h2><button onclick="closeModal('config-modal')" class="text-2xl">✕</button></div>
+            <div class="bg-slate-50 p-6 rounded-[2rem] mb-8">
+                <input id="in-name" type="text" placeholder="Nombre" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white">
+                <input id="in-price" type="number" placeholder="Precio ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white">
+                <button onclick="saveProduct()" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl uppercase text-xs">Añadir Producto</button>
             </div>
-            
-            <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 mb-8">
-                <p class="text-[9px] font-black text-indigo-500 uppercase mb-4 tracking-widest">Añadir Nuevo Producto</p>
-                <input id="in-name" type="text" placeholder="Nombre" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white border-none shadow-sm outline-none">
-                <input id="in-price" type="number" placeholder="Precio ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white border-none shadow-sm outline-none">
-                <button onclick="saveProduct()" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl uppercase text-xs shadow-lg shadow-indigo-100">Guardar Producto</button>
-            </div>
-
-            <p class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-widest">Productos Actuales</p>
             <div id="edit-list" class="space-y-1"></div>
         </div>
     </div>
 
-    <!-- Modal Reporte y Borrado de Ventas -->
-    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
+    <!-- Notas -->
+    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-orange-400">📝 Notas del Día</h2><button onclick="closeModal('notes-modal')" class="text-2xl">✕</button></div>
+            <textarea id="notes-area" oninput="saveNotes()" class="w-full h-[60vh] p-8 bg-orange-50 rounded-[3rem] font-bold text-slate-700 outline-none border-none resize-none placeholder-orange-200" placeholder="Escribe recordatorios, pedidos, etc..."></textarea>
+        </div>
+    </div>
+
+    <!-- Gastos -->
+    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-red-400">💸 Gastos</h2><button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button></div>
+            <div class="bg-red-50 p-6 rounded-[2rem] mb-8">
+                <input id="exp-name" type="text" placeholder="Ej: Comida" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white">
+                <input id="exp-price" type="number" placeholder="Monto ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white">
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="saveExpense('cash')" class="py-4 bg-[#10b981] text-white font-black rounded-xl uppercase text-[9px]">Efectivo</button>
+                    <button onclick="saveExpense('mp')" class="py-4 bg-[#0ea5e9] text-white font-black rounded-xl uppercase text-[9px]">M. Pago</button>
+                </div>
+            </div>
+            <div id="expenses-list" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Historial -->
+    <div id="history-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400">📂 Historial de Cierres</h2><button onclick="closeModal('history-modal')" class="text-2xl">✕</button></div>
+            <div id="history-list" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- Reporte / Vista de Cierre -->
+    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[250] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between mb-8 no-print items-center">
                 <button onclick="closeModal('report-modal')" class="font-black text-slate-400 text-[10px] uppercase">✕ Cerrar</button>
                 <button onclick="window.print()" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase">Imprimir</button>
             </div>
             <div id="report-content"></div>
-        </div>
-    </div>
-
-    <!-- Modal Gastos -->
-    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-red-400">💸 Gastos</h2><button onclick="closeModal('expenses-modal')" class="text-2xl text-slate-300">✕</button></div>
-            <div class="bg-red-50 p-6 rounded-[2rem] border border-red-100 mb-8">
-                <input id="exp-name" type="text" placeholder="Ej: Comida" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white border-none shadow-sm"><input id="exp-price" type="number" placeholder="Monto ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white border-none shadow-sm">
-                <div class="grid grid-cols-2 gap-3"><button onclick="saveExpense('cash')" class="py-4 bg-[#10b981] text-white font-black rounded-xl uppercase text-[10px]">Pagué Efectivo</button><button onclick="saveExpense('mp')" class="py-4 bg-[#0ea5e9] text-white font-black rounded-xl uppercase text-[10px]">Pagué M. Pago</button></div>
-            </div>
-            <div id="expenses-list"></div>
         </div>
     </div>
 
@@ -198,49 +214,26 @@
                 `).join('');
         }
 
+        // --- VENTAS ---
         function askConfirmation(id) {
             pendingItem = getSafe(currentBooth + '_products').find(p => p.id === id);
             currentQty = 1; updateQtyDisplay();
             document.getElementById('confirm-item-name').innerText = pendingItem.name;
             document.getElementById('confirm-modal').classList.remove('hidden');
         }
-
         function updateQty(v) { currentQty = Math.max(1, currentQty + v); updateQtyDisplay(); }
         function updateQtyDisplay() {
             document.getElementById('confirm-qty').innerText = currentQty;
             document.getElementById('confirm-total').innerText = "$" + (pendingItem.price * currentQty).toLocaleString();
         }
-
         function confirmSale(method) {
-            const key = currentBooth + '_sales';
-            const sales = getSafe(key);
+            const sales = getSafe(currentBooth + '_sales');
             sales.push({ id: Date.now(), name: pendingItem.name, qty: currentQty, totalPrice: pendingItem.price * currentQty, method, hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
-            localStorage.setItem(key, JSON.stringify(sales));
+            localStorage.setItem(currentBooth + '_sales', JSON.stringify(sales));
             closeModal('confirm-modal'); render();
         }
 
-        function deleteSale(booth, id) {
-            if(confirm("¿Borrar venta?")) {
-                const sales = getSafe(booth + '_sales').filter(s => s.id !== id);
-                localStorage.setItem(booth + '_sales', JSON.stringify(sales));
-                generateReport(); render();
-            }
-        }
-
-        function generateReport() {
-            let html = `<h2 class="text-center font-black uppercase text-xl mb-8">Balance del Día</h2>`;
-            ['bijou', 'okidokie'].forEach(p => {
-                const sales = getSafe(p + '_sales');
-                html += `<div class="mb-6"><p class="text-[9px] font-black text-slate-400 uppercase mb-3 border-b pb-1">${p === 'bijou' ? '✨ A TU ESTILO' : '🤖 OKIEDOKIE'}</p>`;
-                sales.forEach(s => {
-                    html += `<div class="flex justify-between items-center py-2 border-b border-slate-50"><div class="text-[10px] font-bold"><p class="text-slate-800 uppercase leading-none mb-1">${s.name} x${s.qty}</p><p class="text-slate-400 font-medium tracking-tight">${s.hora} - $${s.totalPrice.toLocaleString()} (${s.method})</p></div><button onclick="deleteSale('${p}', ${s.id})" class="text-red-400 font-black text-[9px] bg-red-50 px-2 py-1 rounded">BORRAR</button></div>`;
-                });
-                html += `</div>`;
-            });
-            document.getElementById('report-content').innerHTML = html;
-            document.getElementById('report-modal').classList.remove('hidden');
-        }
-
+        // --- STOCK ---
         function openConfig() { document.getElementById('config-modal').classList.remove('hidden'); renderEditList(); }
         function saveProduct() {
             const n = document.getElementById('in-name').value, p = parseInt(document.getElementById('in-price').value);
@@ -253,8 +246,11 @@
         }
         function renderEditList() {
             document.getElementById('edit-list').innerHTML = getSafe(currentBooth + '_products').map(p => `
-                <div class="manage-card"><div class="text-[10px] font-black uppercase"><p class="text-slate-800">${p.name}</p><p class="text-indigo-500">$${p.price.toLocaleString()}</p></div><button onclick="deleteProduct(${p.id})" class="text-red-400 font-black text-[9px] bg-red-50 px-3 py-2 rounded-xl uppercase">Eliminar</button></div>
-            `).join('') || '<p class="text-center py-10 text-slate-300 text-[10px] uppercase">Sin productos</p>';
+                <div class="manage-card">
+                    <div class="text-[10px] font-black uppercase"><p>${p.name}</p><p class="text-indigo-500">$${p.price}</p></div>
+                    <button onclick="deleteProduct(${p.id})" class="text-red-400 font-black text-[9px] bg-red-50 px-3 py-2 rounded-xl">Eliminar</button>
+                </div>
+            `).join('');
         }
         function deleteProduct(id) {
             const items = getSafe(currentBooth + '_products').filter(i => i.id !== id);
@@ -262,6 +258,7 @@
             renderEditList(); render();
         }
 
+        // --- GASTOS ---
         function openExpenses() { document.getElementById('expenses-modal').classList.remove('hidden'); renderExp(); }
         function saveExpense(method) {
             const n = document.getElementById('exp-name').value, p = parseInt(document.getElementById('exp-price').value);
@@ -274,23 +271,82 @@
         }
         function renderExp() {
             document.getElementById('expenses-list').innerHTML = getSafe('global_expenses').map(e => `
-                <div class="flex justify-between p-4 bg-red-50 rounded-2xl text-[10px] font-bold text-red-800 uppercase mb-2"><span>${e.name} (${e.method})</span><span>-$${e.amount}</span></div>
+                <div class="flex justify-between p-4 bg-red-50 rounded-2xl text-[10px] font-bold text-red-800 uppercase">
+                    <span>${e.name} (${e.method})</span><span>-$${e.amount}</span>
+                </div>
             `).join('');
         }
 
-        function forceReset() { 
-            if(confirm("⚠️ ¿Cerrar caja y finalizar el día? Se borrarán todas las ventas y gastos de hoy. Asegúrate de haber anotado el total.")) { 
-                localStorage.setItem('bijou_sales', '[]'); 
-                localStorage.setItem('okidokie_sales', '[]'); 
-                localStorage.setItem('global_expenses', '[]'); 
-                render(); 
-                alert("Caja cerrada. ¡Buen descanso!");
-            } 
+        // --- NOTAS ---
+        function openNotes() {
+            document.getElementById('notes-area').value = localStorage.getItem('feria_notes') || "";
+            document.getElementById('notes-modal').classList.remove('hidden');
+        }
+        function saveNotes() {
+            localStorage.setItem('feria_notes', document.getElementById('notes-area').value);
         }
 
-        function openNotes() { alert("Función de notas próximamente."); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        // --- HISTORIAL & CIERRE ---
+        function openHistory() {
+            const history = getSafe('feria_history');
+            document.getElementById('history-list').innerHTML = history.map(h => `
+                <div class="bg-white border border-slate-100 p-6 rounded-[2rem] flex justify-between items-center shadow-sm">
+                    <div>
+                        <p class="text-[10px] font-black text-slate-800 uppercase">${h.fecha}</p>
+                        <p class="text-indigo-500 font-black text-xs mt-1">Total: ${h.totalCash} | ${h.totalMp}</p>
+                    </div>
+                    <button onclick='viewHistoryDetail(${JSON.stringify(h)})' class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase">Detalle</button>
+                </div>
+            `).join('') || '<p class="text-center py-20 text-slate-300 font-black uppercase text-[10px]">Sin cierres</p>';
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
 
+        function handleCloseDay() {
+            const b = getSafe('bijou_sales'), o = getSafe('okidokie_sales');
+            if (b.length === 0 && o.length === 0) return alert("Nada que cerrar hoy.");
+            if (confirm("¿Cerrar caja y guardar este día en el historial?")) {
+                const closure = {
+                    id: Date.now(), fecha: new Date().toLocaleDateString(),
+                    hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+                    bijou: b, oki: o, expenses: getSafe('global_expenses'),
+                    totalCash: document.getElementById('total-cash').innerText,
+                    totalMp: document.getElementById('total-mp').innerText
+                };
+                const history = getSafe('feria_history');
+                history.unshift(closure);
+                localStorage.setItem('feria_history', JSON.stringify(history));
+                localStorage.setItem('bijou_sales', '[]'); localStorage.setItem('okidokie_sales', '[]'); localStorage.setItem('global_expenses', '[]');
+                localStorage.setItem('feria_notes', ""); // Limpiar notas al cerrar día
+                render(); alert("Día guardado con éxito.");
+            }
+        }
+
+        function viewHistoryDetail(h) {
+            let html = `
+                <div class="text-center mb-8"><h2 class="font-black text-xl uppercase">${h.fecha}</h2><p class="text-[9px] text-slate-400 uppercase font-bold">Cierre: ${h.hora}</p></div>
+                <div class="space-y-6">
+                    <div><p class="text-[9px] font-black text-slate-400 border-b mb-2 uppercase">A Tu Estilo</p>
+                    ${h.bijou.map(s => `<div class="flex justify-between text-[10px] py-1"><span>${s.hora} - ${s.name} x${s.qty}</span><span class="font-bold">$${s.totalPrice}</span></div>`).join('') || 'Sin ventas'}</div>
+                    <div><p class="text-[9px] font-black text-slate-400 border-b mb-2 uppercase">Okiedokie</p>
+                    ${h.oki.map(s => `<div class="flex justify-between text-[10px] py-1"><span>${s.hora} - ${s.name} x${s.qty}</span><span class="font-bold">$${s.totalPrice}</span></div>`).join('') || 'Sin ventas'}</div>
+                    <div><p class="text-[9px] font-black text-red-400 border-b mb-2 uppercase">Gastos</p>
+                    ${h.expenses.map(e => `<div class="flex justify-between text-[10px] py-1 text-red-500 italic"><span>${e.name}</span><span>-$${e.amount}</span></div>`).join('') || 'Sin gastos'}</div>
+                </div>
+                <div class="mt-8 p-6 bg-slate-900 rounded-[2rem] text-white text-xs font-black uppercase tracking-tight">
+                    <p class="flex justify-between mb-2"><span>Efectivo:</span> <span>${h.totalCash}</span></p>
+                    <p class="flex justify-between"><span>M. Pago:</span> <span>${h.totalMp}</span></p>
+                </div>
+            `;
+            document.getElementById('report-content').innerHTML = html;
+            document.getElementById('report-modal').classList.remove('hidden');
+        }
+
+        function generateReport() {
+            const h = { fecha: "Hoy (En curso)", hora: "Actual", bijou: getSafe('bijou_sales'), oki: getSafe('okidokie_sales'), expenses: getSafe('global_expenses'), totalCash: document.getElementById('total-cash').innerText, totalMp: document.getElementById('total-mp').innerText };
+            viewHistoryDetail(h);
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         window.onload = render;
     </script>
 </body>
