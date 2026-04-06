@@ -3,279 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Caja Feria - Control Total</title>
+    <title>Ventas Pro - Feria</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .active-tab-estilo { border-bottom: 4px solid #db2777; color: #db2777; font-weight: 900; }
-        .active-tab-oki { border-bottom: 4px solid #4f46e5; color: #4f46e5; font-weight: 900; }
-        .product-card { background: white; border-radius: 1.5rem; padding: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; height: 110px; border: 1px solid #f1f5f9; }
-        .history-card { background: white; border-radius: 1.5rem; padding: 1.2rem; margin-bottom: 0.8rem; border-left: 5px solid #64748b; box-shadow: 0 4px 10px rgba(0,0,0,0.04); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #fcfcfd; 
+            color: #1e293b;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tab-active-pink { border-bottom: 4px solid #db2777; color: #db2777; font-weight: 800; }
+        .tab-active-blue { border-bottom: 4px solid #6366f1; color: #6366f1; font-weight: 800; }
+        
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
+        
+        .product-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 160px;
+            transition: transform 0.1s;
+            border: 1px solid #f1f5f9;
+        }
+        
+        .product-card:active { transform: scale(0.95); }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 1.5rem;
+            margin-bottom: 1rem;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #f1f5f9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-border-oki { border-left: 6px solid #6366f1; }
+        .history-border-bijou { border-left: 6px solid #f472b6; }
+
         @media print { .no-print { display: none; } }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-10">
 
-    <div id="app" class="max-w-md mx-auto px-4">
-        <!-- Navegación -->
-        <nav class="flex bg-white border-b sticky top-0 z-40 -mx-4 mb-6 shadow-sm no-print">
-            <button onclick="switchBooth('estilo')" id="tab-estilo" class="flex-1 py-4 text-[10px] uppercase active-tab-estilo tracking-tight">✨ A TU ESTILO.</button>
-            <button onclick="switchBooth('oki')" id="tab-oki" class="flex-1 py-4 text-[10px] uppercase text-slate-400 tracking-tight">🤖 OKIEDOKIE</button>
+    <div id="app" class="max-w-md mx-auto px-4 pt-4">
+        <!-- Tabs Superiores -->
+        <nav class="flex bg-white sticky top-0 z-40 -mx-4 mb-6 no-print border-b">
+            <button onclick="setBooth('bijou')" id="tab-bijou" class="flex-1 py-4 text-[11px] uppercase tracking-wider transition-all">✨ A TU ESTILO.</button>
+            <button onclick="setBooth('oki')" id="tab-oki" class="flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400 transition-all">🤖 OKIEDOKIE</button>
         </nav>
 
-        <!-- Dinero en Caja -->
-        <div class="grid grid-cols-2 gap-4 mb-6 no-print">
-            <div class="bg-[#10b981] p-5 rounded-[2rem] text-white shadow-lg">
-                <p class="text-[8px] font-black uppercase opacity-80 tracking-widest mb-1">Efectivo Hoy</p>
-                <p id="total-cash" class="text-xl font-extrabold">$0</p>
+        <!-- Totales (Cards de colores) -->
+        <div class="grid grid-cols-2 gap-3 mb-6 no-print">
+            <div class="bg-[#10b981] p-5 rounded-[1.8rem] text-white card-shadow">
+                <p class="text-[9px] font-bold uppercase opacity-90 mb-1">Efectivo Real</p>
+                <p id="cash-display" class="text-2xl font-extrabold">$0</p>
             </div>
-            <div class="bg-[#0ea5e9] p-5 rounded-[2rem] text-white shadow-lg">
-                <p class="text-[8px] font-black uppercase opacity-80 tracking-widest mb-1">M. Pago Hoy</p>
-                <p id="total-mp" class="text-xl font-extrabold">$0</p>
+            <div class="bg-[#0ea5e9] p-5 rounded-[1.8rem] text-white card-shadow">
+                <p class="text-[9px] font-bold uppercase opacity-90 mb-1">M. Pago Real</p>
+                <p id="mp-display" class="text-2xl font-extrabold">$0</p>
             </div>
         </div>
 
-        <!-- Productos -->
-        <div id="products-grid" class="grid grid-cols-2 gap-3 mb-8"></div>
+        <!-- Buscador -->
+        <div class="relative mb-8 no-print">
+            <input type="text" placeholder="🔍 Buscar producto..." class="w-full py-4 px-6 rounded-2xl bg-white border border-slate-100 shadow-sm outline-none font-medium text-slate-500">
+        </div>
 
-        <!-- Botones de Acción -->
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-50 no-print space-y-4">
+        <!-- Grid de Productos -->
+        <div id="products-grid" class="grid grid-cols-2 gap-4 mb-10"></div>
+
+        <!-- Panel de Acciones Inferior -->
+        <div class="bg-white p-6 rounded-[2.5rem] card-shadow border border-slate-50 no-print space-y-4 mb-10">
+            <!-- Botón Reporte Principal -->
+            <button onclick="showTodayReport()" class="w-full py-4 bg-[#111827] text-white font-bold rounded-2xl flex items-center justify-center gap-2 uppercase text-xs tracking-tight">
+                📄 REPORTE CON HORARIOS
+            </button>
+
+            <!-- Fila de 3 Botones -->
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="openConfig()" class="py-4 bg-slate-100 text-slate-600 font-black rounded-2xl uppercase text-[9px]">📦 Stock</button>
-                <button onclick="openExpenses()" class="py-4 bg-red-50 text-red-600 font-black rounded-2xl uppercase text-[9px]">💸 Gastos</button>
-                <button onclick="openNotes()" class="py-4 bg-amber-50 text-amber-600 font-black rounded-2xl uppercase text-[9px]">📝 Notas</button>
+                <button onclick="openModal('stock-modal'); renderStock();" class="btn-action bg-[#f1f5f9] text-[#475569]">📦 STOCK</button>
+                <button onclick="openNotes()" class="btn-action bg-[#fffbeb] text-[#d97706]">📝 NOTAS</button>
+                <button onclick="openModal('expenses-modal')" class="btn-action bg-[#fef2f2] text-[#dc2626]">💸 GASTOS</button>
             </div>
-            <button onclick="openHistory()" class="w-full py-4 bg-indigo-50 text-indigo-600 font-black rounded-2xl uppercase text-[10px] tracking-widest">📂 Ver Historial de Cierres</button>
-            <button onclick="handleCloseDay()" class="w-full py-5 bg-red-600 text-white font-black rounded-2xl shadow-lg uppercase text-xs">⚠️ Cerrar Caja del Día</button>
+
+            <!-- Botón Historial -->
+            <button onclick="openHistory()" class="w-full py-4 bg-[#f8fafc] text-slate-500 font-bold rounded-2xl flex items-center justify-center gap-2 uppercase text-[10px] border border-slate-100">
+                📂 HISTORIAL DE CIERRES
+            </button>
+
+            <!-- Botón Cierre -->
+            <button onclick="confirmCloseDay()" class="w-full py-4 bg-[#fef2f2] text-[#ef4444] font-bold rounded-2xl flex items-center justify-center gap-2 uppercase text-[10px]">
+                ⚠️ CIERRE DE CAJA
+            </button>
         </div>
     </div>
 
-    <!-- MODAL: NOTAS (RECUPERADO) -->
-    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+    <!-- MODALES -->
+
+    <!-- Historial de Cierres -->
+    <div id="history-modal" class="hidden fixed inset-0 bg-white z-[100] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="font-black uppercase text-xs text-amber-600">Bloc de Notas / Pendientes</h2>
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📂</span>
+                    <h2 class="font-bold uppercase text-[10px] tracking-widest text-slate-400">Historial de Cierres</h2>
+                </div>
+                <button onclick="closeModal('history-modal')" class="text-2xl">✕</button>
+            </div>
+            
+            <div id="history-content" class="space-y-3"></div>
+
+            <div class="mt-20 p-6 bg-red-50 rounded-[2.5rem] text-center space-y-4">
+                <p class="text-[10px] font-bold text-red-400 uppercase tracking-widest">Zona de Peligro</p>
+                <button onclick="resetToday()" class="w-full py-4 bg-white text-red-500 font-bold rounded-2xl border border-red-100 uppercase text-[10px]">Restablecer Ventas de Hoy</button>
+                <button onclick="clearAllHistory()" class="w-full py-4 bg-red-500 text-white font-bold rounded-2xl uppercase text-[10px]">Borrar todo el historial</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notas -->
+    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[100] p-6">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-bold text-amber-600 uppercase text-xs">📝 Notas y Pendientes</h2>
                 <button onclick="closeModal('notes-modal')" class="text-2xl">✕</button>
             </div>
-            <textarea id="notes-input" placeholder="Escribe aquí notas, pedidos o deudas..." class="w-full h-48 p-4 bg-amber-50 border border-amber-100 rounded-3xl font-bold text-sm outline-none mb-4" oninput="saveNotes()"></textarea>
-            <p class="text-[9px] text-amber-400 font-black uppercase text-center">Se guarda automáticamente al escribir</p>
+            <textarea id="notes-input" oninput="saveNotes()" placeholder="Anota deudas o recordatorios..." class="w-full h-[60vh] p-6 bg-amber-50 rounded-[2rem] border-none outline-none font-medium text-amber-900"></textarea>
         </div>
     </div>
 
-    <!-- MODAL: HISTORIAL -->
-    <div id="history-modal" class="hidden fixed inset-0 bg-slate-50 z-[200] p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="font-black uppercase text-xs tracking-widest text-slate-500">Historial de Cierres</h2>
-                <button onclick="closeModal('history-modal')" class="text-2xl font-bold bg-white w-10 h-10 rounded-full shadow-sm">✕</button>
-            </div>
-            <div id="history-list" class="space-y-4"></div>
-            <button onclick="clearHistory()" class="mt-12 w-full py-4 text-red-400 font-bold text-[10px] uppercase border border-red-100 rounded-2xl">Borrar Todo el Historial</button>
-        </div>
-    </div>
-
-    <!-- MODAL: DETALLE DEL CIERRE -->
-    <div id="detail-modal" class="hidden fixed inset-0 bg-white z-[250] p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between mb-8 items-center no-print">
-                <button onclick="closeModal('detail-modal')" class="font-black text-slate-400 text-[10px] uppercase">✕ Volver</button>
-                <button onclick="window.print()" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-[10px] font-black">IMPRIMIR</button>
-            </div>
-            <div id="detail-content"></div>
-        </div>
-    </div>
-
-    <!-- MODAL: VENTA -->
-    <div id="confirm-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-end justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 shadow-2xl text-center">
-            <h3 id="confirm-name" class="font-black uppercase text-slate-800 mb-6"></h3>
+    <!-- Venta / Confirmación -->
+    <div id="sale-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] flex items-end justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 card-shadow text-center">
+            <h3 id="sale-product-name" class="font-extrabold uppercase text-slate-800 text-lg mb-6"></h3>
             <div class="flex justify-center gap-6 mb-8 items-center">
-                <button onclick="modQty(-1)" class="w-12 h-12 bg-slate-100 rounded-full text-xl font-bold">−</button>
-                <span id="confirm-qty" class="text-3xl font-black">1</span>
-                <button onclick="modQty(1)" class="w-12 h-12 bg-slate-100 rounded-full text-xl font-bold">+</button>
+                <button onclick="changeQty(-1)" class="w-12 h-12 bg-slate-100 rounded-full text-2xl font-bold">−</button>
+                <span id="sale-qty" class="text-4xl font-black">1</span>
+                <button onclick="changeQty(1)" class="w-12 h-12 bg-slate-100 rounded-full text-2xl font-bold">+</button>
             </div>
             <div class="grid gap-3">
-                <button onclick="doSale('cash')" class="py-5 bg-emerald-500 text-white font-black rounded-2xl uppercase text-xs">Efectivo</button>
-                <button onclick="doSale('mp')" class="py-5 bg-sky-500 text-white font-black rounded-2xl uppercase text-xs">Mercado Pago</button>
-                <button onclick="closeModal('confirm-modal')" class="py-3 text-slate-400 font-bold text-[10px] uppercase">Cancelar</button>
+                <button onclick="processSale('cash')" class="py-5 bg-emerald-500 text-white font-bold rounded-2xl uppercase text-xs tracking-widest">Efectivo</button>
+                <button onclick="processSale('mp')" class="py-5 bg-sky-500 text-white font-bold rounded-2xl uppercase text-xs tracking-widest">Mercado Pago</button>
+                <button onclick="closeModal('sale-modal')" class="py-3 text-slate-400 font-bold text-[10px] uppercase">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL GASTOS -->
-    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[150] p-6">
+    <!-- Reporte de Detalle (Para hoy y para historial) -->
+    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center no-print mb-8">
+                <button onclick="closeModal('report-modal')" class="text-slate-400 font-bold uppercase text-[10px]">✕ Cerrar</button>
+                <button onclick="window.print()" class="bg-[#111827] text-white px-6 py-2 rounded-xl font-bold text-[10px]">IMPRIMIR</button>
+            </div>
+            <div id="report-content"></div>
+        </div>
+    </div>
+
+    <!-- Gastos -->
+    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[100] p-6">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="font-black uppercase text-xs text-red-500">Registrar Gasto</h2>
+                <h2 class="font-bold text-red-500 uppercase text-xs">💸 Registrar Gasto</h2>
                 <button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button>
             </div>
-            <div class="space-y-4">
-                <input id="exp-desc" type="text" placeholder="Concepto (ej: Comida)" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
-                <input id="exp-amt" type="number" placeholder="Monto $" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
-                <div class="grid grid-cols-2 gap-4 pt-4">
-                    <button onclick="addExp('cash')" class="py-4 bg-emerald-500 text-white font-black rounded-xl text-[10px] uppercase">Efectivo</button>
-                    <button onclick="addExp('mp')" class="py-4 bg-sky-500 text-white font-black rounded-xl text-[10px] uppercase">M. Pago</button>
-                </div>
+            <input id="exp-desc" type="text" placeholder="Concepto" class="w-full p-4 bg-slate-50 rounded-2xl mb-3 outline-none font-bold">
+            <input id="exp-amt" type="number" placeholder="Monto $" class="w-full p-4 bg-slate-50 rounded-2xl mb-6 outline-none font-bold">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="saveExpense('cash')" class="py-4 bg-emerald-500 text-white font-bold rounded-2xl text-[10px] uppercase">Efectivo</button>
+                <button onclick="saveExpense('mp')" class="py-4 bg-sky-500 text-white font-bold rounded-2xl text-[10px] uppercase">M. Pago</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL STOCK -->
-    <div id="config-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+    <!-- Stock -->
+    <div id="stock-modal" class="hidden fixed inset-0 bg-white z-[100] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="font-black uppercase text-xs">Gestionar Productos</h2>
-                <button onclick="closeModal('config-modal')" class="text-2xl">✕</button>
+                <h2 class="font-bold uppercase text-xs">📦 Gestionar Stock</h2>
+                <button onclick="closeModal('stock-modal')" class="text-2xl">✕</button>
             </div>
-            <div class="bg-slate-50 p-6 rounded-3xl mb-8">
-                <input id="new-name" type="text" placeholder="Nombre" class="w-full p-4 rounded-xl mb-3 font-bold outline-none">
-                <input id="new-price" type="number" placeholder="Precio $" class="w-full p-4 rounded-xl mb-4 font-bold outline-none">
-                <button onclick="addProduct()" class="w-full py-4 bg-black text-white font-black rounded-xl uppercase text-[10px]">Añadir Producto</button>
+            <div class="bg-slate-50 p-6 rounded-[2rem] mb-6 space-y-3">
+                <input id="stock-name" type="text" placeholder="Nombre del producto" class="w-full p-4 rounded-xl outline-none font-bold">
+                <input id="stock-price" type="number" placeholder="Precio $" class="w-full p-4 rounded-xl outline-none font-bold">
+                <button onclick="addNewProduct()" class="w-full py-4 bg-black text-white font-bold rounded-xl uppercase text-[10px]">Añadir Producto</button>
             </div>
             <div id="stock-list" class="space-y-2"></div>
         </div>
     </div>
 
     <script>
-        let currentBooth = 'estilo';
-        let selProduct = null;
-        let selQty = 1;
+        let currentBooth = 'bijou';
+        let selectedProduct = null;
+        let selectedQty = 1;
 
-        const load = (key) => {
-            const data = localStorage.getItem(key);
-            if (!data) return [];
-            try { return JSON.parse(data); } catch(e) { return []; }
+        // Persistencia
+        const db = {
+            get: (key) => JSON.parse(localStorage.getItem(key)) || [],
+            set: (key, val) => localStorage.setItem(key, JSON.stringify(val))
         };
-        const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
-        function switchBooth(b) {
+        function setBooth(b) {
             currentBooth = b;
-            document.getElementById('tab-estilo').className = b === 'estilo' ? 'flex-1 py-4 text-[10px] uppercase active-tab-estilo tracking-tight' : 'flex-1 py-4 text-[10px] uppercase text-slate-400 tracking-tight';
-            document.getElementById('tab-oki').className = b === 'oki' ? 'flex-1 py-4 text-[10px] uppercase active-tab-oki tracking-tight' : 'flex-1 py-4 text-[10px] uppercase text-slate-400 tracking-tight';
+            const tBijou = document.getElementById('tab-bijou');
+            const tOki = document.getElementById('tab-oki');
+            
+            if(b === 'bijou') {
+                tBijou.className = "flex-1 py-4 text-[11px] uppercase tracking-wider tab-active-pink";
+                tOki.className = "flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400";
+            } else {
+                tBijou.className = "flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400";
+                tOki.className = "flex-1 py-4 text-[11px] uppercase tracking-wider tab-active-blue";
+            }
             render();
         }
 
         function render() {
+            // Calcular Totales Diarios
             let cash = 0, mp = 0;
-            ['estilo', 'oki'].forEach(p => {
-                load(p + '_v').forEach(v => { if(v.m === 'cash') cash += v.t; else mp += v.t; });
-                load(p + '_g').forEach(g => { if(g.m === 'cash') cash -= g.a; else mp -= g.a; });
+            ['bijou', 'oki'].forEach(b => {
+                db.get(`${b}_sales`).forEach(s => { if(s.m === 'cash') cash += s.t; else mp += s.t; });
+                db.get(`${b}_expenses`).forEach(e => { if(e.m === 'cash') cash -= e.a; else mp -= e.a; });
             });
-            document.getElementById('total-cash').innerText = "$" + cash.toLocaleString();
-            document.getElementById('total-mp').innerText = "$" + mp.toLocaleString();
+            document.getElementById('cash-display').innerText = `$${cash.toLocaleString()}`;
+            document.getElementById('mp-display').innerText = `$${mp.toLocaleString()}`;
+
+            // Render Grid
             const grid = document.getElementById('products-grid');
-            const prods = load(currentBooth + '_p');
+            const prods = db.get(`${currentBooth}_products`);
             grid.innerHTML = prods.map(p => `
-                <button onclick="openSale(${p.id})" class="product-card">
-                    <span class="text-[10px] font-black uppercase text-slate-500">${p.n}</span>
-                    <span class="text-indigo-600 font-black">$${p.p.toLocaleString()}</span>
+                <button onclick="openSale(${p.id})" class="product-card card-shadow">
+                    <span class="text-[11px] font-bold uppercase text-slate-400 mb-2">${p.n}</span>
+                    <span class="text-xl font-extrabold text-[#6366f1]">$${p.p.toLocaleString()}</span>
                 </button>
             `).join('');
         }
 
         function openSale(id) {
-            selProduct = load(currentBooth + '_p').find(p => p.id === id);
-            selQty = 1;
-            document.getElementById('confirm-name').innerText = selProduct.n;
-            document.getElementById('confirm-qty').innerText = "1";
-            document.getElementById('confirm-modal').classList.remove('hidden');
+            selectedProduct = db.get(`${currentBooth}_products`).find(p => p.id === id);
+            selectedQty = 1;
+            document.getElementById('sale-product-name').innerText = selectedProduct.n;
+            document.getElementById('sale-qty').innerText = "1";
+            openModal('sale-modal');
         }
-        function modQty(v) { selQty = Math.max(1, selQty + v); document.getElementById('confirm-qty').innerText = selQty; }
-        function doSale(m) {
-            const list = load(currentBooth + '_v');
-            list.push({ id: Date.now(), n: selProduct.n, q: selQty, t: selProduct.p * selQty, m, h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
-            save(currentBooth + '_v', list);
-            closeModal('confirm-modal');
+
+        function changeQty(v) {
+            selectedQty = Math.max(1, selectedQty + v);
+            document.getElementById('sale-qty').innerText = selectedQty;
+        }
+
+        function processSale(m) {
+            const sales = db.get(`${currentBooth}_sales`);
+            sales.push({
+                id: Date.now(),
+                n: selectedProduct.n,
+                q: selectedQty,
+                t: selectedProduct.p * selectedQty,
+                m: m,
+                h: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            });
+            db.set(`${currentBooth}_sales`, sales);
+            closeModal('sale-modal');
             render();
         }
 
-        function addExp(m) {
-            const d = document.getElementById('exp-desc').value, a = parseInt(document.getElementById('exp-amt').value);
-            if(!d || !a) return;
-            const list = load(currentBooth + '_g');
-            list.push({ id: Date.now(), d, a, m });
-            save(currentBooth + '_g', list);
-            document.getElementById('exp-desc').value = ""; document.getElementById('exp-amt').value = "";
+        function saveExpense(m) {
+            const desc = document.getElementById('exp-desc').value;
+            const amt = parseInt(document.getElementById('exp-amt').value);
+            if(!desc || !amt) return;
+            const exps = db.get(`${currentBooth}_expenses`);
+            exps.push({ id: Date.now(), d: desc, a: amt, m: m });
+            db.set(`${currentBooth}_expenses`, exps);
+            document.getElementById('exp-desc').value = "";
+            document.getElementById('exp-amt').value = "";
             closeModal('expenses-modal');
             render();
         }
 
-        function handleCloseDay() {
-            const vE = load('estilo_v'), vO = load('oki_v'), gE = load('estilo_g'), gO = load('oki_g');
-            if (vE.length === 0 && vO.length === 0 && gE.length === 0 && gO.length === 0) return alert("Sin movimientos.");
-            if(confirm("¿Cerrar caja? Se guardará en historial.")) {
-                const history = load('feria_history_v2');
-                history.unshift({ id: Date.now(), fecha: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), vE, vO, gE, gO, totalE: document.getElementById('total-cash').innerText, totalM: document.getElementById('total-mp').innerText });
-                save('feria_history_v2', history);
-                ['estilo', 'oki'].forEach(p => { save(p + '_v', []); save(p + '_g', []); });
-                render();
-                openHistory();
-            }
+        function showTodayReport() {
+            const vB = db.get('bijou_sales'), vO = db.get('oki_sales'), gB = db.get('bijou_expenses'), gO = db.get('oki_expenses');
+            const totalCash = document.getElementById('cash-display').innerText;
+            const totalMp = document.getElementById('mp-display').innerText;
+            
+            buildReportHTML({ fecha: 'HOY', hora: 'Cierre Actual', vB, vO, gB, gO, totalCash, totalMp });
+            openModal('report-modal');
+        }
+
+        function buildReportHTML(data) {
+            const container = document.getElementById('report-content');
+            container.innerHTML = `
+                <div class="text-center mb-10">
+                    <h1 class="text-3xl font-black uppercase tracking-tighter">${data.fecha}</h1>
+                    <p class="text-slate-400 font-bold text-[10px] uppercase">${data.hora}</p>
+                </div>
+                
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-[10px] font-black text-pink-500 uppercase border-b pb-2 mb-3">✨ BIJOU</h3>
+                        ${data.vB.length ? data.vB.map(v => `<div class="flex justify-between text-xs font-bold py-1"><span>${v.n} x${v.q} <span class="text-[9px] text-slate-300 ml-1">${v.h}</span></span><span>$${v.t.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin ventas</p>'}
+                    </div>
+
+                    <div>
+                        <h3 class="text-[10px] font-black text-indigo-500 uppercase border-b pb-2 mb-3">🤖 OKI</h3>
+                        ${data.vO.length ? data.vO.map(v => `<div class="flex justify-between text-xs font-bold py-1"><span>${v.n} x${v.q} <span class="text-[9px] text-slate-300 ml-1">${v.h}</span></span><span>$${v.t.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin ventas</p>'}
+                    </div>
+
+                    <div>
+                        <h3 class="text-[10px] font-black text-red-500 uppercase border-b pb-2 mb-3">💸 GASTOS</h3>
+                        ${[...data.gB, ...data.gO].length ? [...data.gB, ...data.gO].map(g => `<div class="flex justify-between text-xs font-bold py-1"><span>${g.d}</span><span>-$${g.a.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin gastos</p>'}
+                    </div>
+                </div>
+
+                <div class="mt-12 bg-slate-900 rounded-[2.5rem] p-8 text-white card-shadow">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[10px] font-black uppercase opacity-60">EFECTIVO:</span>
+                        <span class="text-2xl font-black text-emerald-400">${data.totalCash}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-black uppercase opacity-60">M. PAGO:</span>
+                        <span class="text-2xl font-black text-sky-400">${data.totalMp}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function confirmCloseDay() {
+            if(!confirm("¿Estás seguro de cerrar el día? Se guardará en el historial y se limpiarán las ventas actuales.")) return;
+            
+            const history = db.get('feria_history_v3');
+            const report = {
+                id: Date.now(),
+                fecha: new Date().toLocaleDateString(),
+                hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                vB: db.get('bijou_sales'),
+                vO: db.get('oki_sales'),
+                gB: db.get('bijou_expenses'),
+                gO: db.get('oki_expenses'),
+                totalCash: document.getElementById('cash-display').innerText,
+                totalMp: document.getElementById('mp-display').innerText
+            };
+
+            history.unshift(report);
+            db.set('feria_history_v3', history);
+
+            // Limpiar hoy
+            ['bijou', 'oki'].forEach(b => { db.set(`${b}_sales`, []); db.set(`${b}_expenses`, []); });
+            render();
+            openHistory();
         }
 
         function openHistory() {
-            const history = load('feria_history_v2');
-            const list = document.getElementById('history-list');
-            list.innerHTML = history.length === 0 ? '<div class="text-center py-20 text-slate-300 font-bold uppercase text-[10px]">Vacío</div>' : history.map(h => `
-                <div class="history-card" onclick='showDetail(${JSON.stringify(h)})'>
-                    <div class="flex justify-between items-center">
-                        <div><p class="text-[11px] font-black uppercase">${h.fecha}</p><p class="text-[9px] text-slate-400 font-bold">${h.hora}</p></div>
-                        <div class="text-right"><p class="text-[11px] font-black text-emerald-500">${h.totalE}</p><p class="text-[11px] font-black text-sky-500">${h.totalM}</p></div>
+            const history = db.get('feria_history_v3');
+            const container = document.getElementById('history-content');
+            
+            if(!history.length) {
+                container.innerHTML = `<div class="py-20 text-center text-slate-300 font-bold uppercase text-[10px]">No hay cierres guardados</div>`;
+            } else {
+                container.innerHTML = history.map(h => `
+                    <div class="history-item card-shadow ${h.vB.length > 0 ? 'history-border-bijou' : 'history-border-oki'}">
+                        <div>
+                            <p class="font-black text-xs uppercase">${h.fecha}</p>
+                            <div class="flex gap-3 mt-1 font-bold text-[11px]">
+                                <span class="text-emerald-500">E: ${h.totalCash}</span>
+                                <span class="text-sky-500">M: ${h.totalMp}</span>
+                            </div>
+                        </div>
+                        <button onclick='showHistoryDetail(${JSON.stringify(h)})' class="bg-[#1e293b] text-white px-5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest">Detalle</button>
                     </div>
-                </div>
-            `).join('');
-            document.getElementById('history-modal').classList.remove('hidden');
+                `).join('');
+            }
+            openModal('history-modal');
         }
 
-        function showDetail(h) {
-            document.getElementById('detail-content').innerHTML = `
-                <div class="text-center border-b pb-6 mb-6">
-                    <h2 class="text-xl font-black uppercase">Resumen ${h.fecha}</h2>
-                </div>
-                <div class="space-y-6 text-[11px]">
-                    <div><p class="font-black text-pink-500 border-b mb-2">A TU ESTILO</p>${h.vE.map(v => `<div class="flex justify-between"><span>${v.n} x${v.q}</span><span>$${v.t}</span></div>`).join('') || 'Sin ventas'}</div>
-                    <div><p class="font-black text-indigo-500 border-b mb-2">OKIEDOKIE</p>${h.vO.map(v => `<div class="flex justify-between"><span>${v.n} x${v.q}</span><span>$${v.t}</span></div>`).join('') || 'Sin ventas'}</div>
-                </div>
-                <div class="mt-8 p-6 bg-slate-900 rounded-3xl text-white font-black">
-                    <div class="flex justify-between mb-2"><span>EFECTIVO:</span><span class="text-emerald-400">${h.totalE}</span></div>
-                    <div class="flex justify-between"><span>M. PAGO:</span><span class="text-sky-400">${h.totalM}</span></div>
-                </div>`;
-            document.getElementById('detail-modal').classList.remove('hidden');
+        function showHistoryDetail(h) {
+            buildReportHTML(h);
+            openModal('report-modal');
         }
 
-        // Lógica de Notas
+        // Notas
         function openNotes() {
-            document.getElementById('notes-input').value = localStorage.getItem('feria_notes') || "";
-            document.getElementById('notes-modal').classList.remove('hidden');
+            document.getElementById('notes-input').value = localStorage.getItem('feria_notes_text') || "";
+            openModal('notes-modal');
         }
         function saveNotes() {
-            localStorage.setItem('feria_notes', document.getElementById('notes-input').value);
+            localStorage.setItem('feria_notes_text', document.getElementById('notes-input').value);
         }
 
-        function openExpenses() { document.getElementById('expenses-modal').classList.remove('hidden'); }
-        function openConfig() { document.getElementById('config-modal').classList.remove('hidden'); renderStock(); }
-        function addProduct() {
-            const n = document.getElementById('new-name').value, p = parseInt(document.getElementById('new-price').value);
+        // Stock
+        function addNewProduct() {
+            const n = document.getElementById('stock-name').value;
+            const p = parseInt(document.getElementById('stock-price').value);
             if(!n || !p) return;
-            const list = load(currentBooth + '_p');
+            const list = db.get(`${currentBooth}_products`);
             list.push({ id: Date.now(), n, p });
-            save(currentBooth + '_p', list);
-            document.getElementById('new-name').value = ""; document.getElementById('new-price').value = "";
-            renderStock(); render();
+            db.set(`${currentBooth}_products`, list);
+            document.getElementById('stock-name').value = "";
+            document.getElementById('stock-price').value = "";
+            renderStock();
+            render();
         }
         function renderStock() {
-            document.getElementById('stock-list').innerHTML = load(currentBooth + '_p').map(p => `
-                <div class="flex justify-between p-4 bg-slate-50 rounded-2xl items-center mb-1">
-                    <div><p class="text-[10px] font-black uppercase">${p.n}</p><p class="text-indigo-500 font-bold">$${p.p}</p></div>
-                    <button onclick="delProd(${p.id})" class="text-red-400 font-bold">✕</button>
-                </div>`).join('');
+            const list = db.get(`${currentBooth}_products`);
+            document.getElementById('stock-list').innerHTML = list.map(p => `
+                <div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100">
+                    <span class="font-bold text-[11px] uppercase">${p.n} ($${p.p})</span>
+                    <button onclick="deleteProduct(${p.id})" class="text-red-400 text-lg">✕</button>
+                </div>
+            `).join('');
         }
-        function delProd(id) { const list = load(currentBooth + '_p').filter(p => p.id !== id); save(currentBooth + '_p', list); renderStock(); render(); }
-        function clearHistory() { if(confirm("¿Borrar historial?")) { save('feria_history_v2', []); openHistory(); } }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function deleteProduct(id) {
+            db.set(`${currentBooth}_products`, db.get(`${currentBooth}_products`).filter(p => p.id !== id));
+            renderStock();
+            render();
+        }
 
-        window.onload = render;
+        // Utilidades
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function resetToday() { if(confirm("Borrar ventas de hoy?")) { ['bijou', 'oki'].forEach(b => { db.set(`${b}_sales`, []); db.set(`${b}_expenses`, []); }); render(); closeModal('history-modal'); } }
+        function clearAllHistory() { if(confirm("Borrar TODO el historial permanentemente?")) { db.set('feria_history_v3', []); openHistory(); } }
+
+        window.onload = () => {
+            // Inicializar con productos de ejemplo si está vacío
+            if(db.get('bijou_products').length === 0) {
+                db.set('bijou_products', [
+                    {id:1, n:'Sorpresas x2', p:1000},
+                    {id:2, n:'Sorpresas x1', p:600},
+                    {id:3, n:'Cadenitas con Imán', p:8000},
+                    {id:4, n:'Pulsera Cadenita', p:3000}
+                ]);
+            }
+            render();
+            setBooth('bijou');
+        };
     </script>
 </body>
 </html>
