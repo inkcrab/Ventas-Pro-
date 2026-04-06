@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Caja Feria - Versión Final Completa</title>
+    <title>Caja Feria - Historial Identificado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
@@ -56,11 +56,11 @@
 
         <!-- Totales -->
         <div class="grid grid-cols-2 gap-4 mb-6 no-print">
-            <div class="bg-[#10b981] p-6 rounded-[1.8rem] text-white shadow-lg">
+            <div class="bg-[#10b981] p-6 rounded-[2rem] text-white shadow-lg">
                 <p class="text-[9px] font-black uppercase opacity-80 tracking-widest mb-1">Efectivo Hoy</p>
                 <p id="total-cash" class="text-2xl font-extrabold">$0</p>
             </div>
-            <div class="bg-[#0ea5e9] p-6 rounded-[1.8rem] text-white shadow-lg">
+            <div class="bg-[#0ea5e9] p-6 rounded-[2rem] text-white shadow-lg">
                 <p class="text-[9px] font-black uppercase opacity-80 tracking-widest mb-1">M. Pago Hoy</p>
                 <p id="total-mp" class="text-2xl font-extrabold">$0</p>
             </div>
@@ -95,7 +95,44 @@
 
     <!-- MODALES -->
 
-    <!-- Venta -->
+    <!-- Gestión Stock -->
+    <div id="config-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400">📦 Gestión Stock</h2><button onclick="closeModal('config-modal')" class="text-2xl">✕</button></div>
+            <div class="bg-slate-50 p-6 rounded-[2rem] mb-8 border border-slate-100">
+                <input id="in-name" type="text" placeholder="Nombre del producto" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white outline-none">
+                <input id="in-price" type="number" placeholder="Precio ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white outline-none">
+                <button onclick="saveProduct()" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl uppercase text-xs">Añadir Producto</button>
+            </div>
+            <div id="edit-list" class="space-y-1"></div>
+        </div>
+    </div>
+
+    <!-- Notas -->
+    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-orange-400">📝 Notas del Día</h2><button onclick="closeModal('notes-modal')" class="text-2xl">✕</button></div>
+            <textarea id="notes-area" oninput="saveNotes()" class="w-full h-[60vh] p-8 bg-orange-50 rounded-[3rem] font-bold text-slate-700 outline-none border-none resize-none placeholder-orange-200" placeholder="Escribe recordatorios..."></textarea>
+        </div>
+    </div>
+
+    <!-- Gastos -->
+    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-red-400">💸 Gastos</h2><button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button></div>
+            <div class="bg-red-50 p-6 rounded-[2rem] mb-8 border border-red-100">
+                <input id="exp-name" type="text" placeholder="Concepto de gasto" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white outline-none">
+                <input id="exp-price" type="number" placeholder="Monto ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="saveExpense('cash')" class="py-4 bg-[#10b981] text-white font-black rounded-xl uppercase text-[9px]">Efectivo</button>
+                    <button onclick="saveExpense('mp')" class="py-4 bg-[#0ea5e9] text-white font-black rounded-xl uppercase text-[9px]">M. Pago</button>
+                </div>
+            </div>
+            <div id="expenses-list" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Venta Confirmación -->
     <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 shadow-2xl">
             <h3 id="confirm-item-name" class="text-lg font-black text-slate-800 mb-4 uppercase text-center">Producto</h3>
@@ -115,43 +152,6 @@
         </div>
     </div>
 
-    <!-- Gestión Stock -->
-    <div id="config-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400">📦 Gestión Stock</h2><button onclick="closeModal('config-modal')" class="text-2xl">✕</button></div>
-            <div class="bg-slate-50 p-6 rounded-[2rem] mb-8">
-                <input id="in-name" type="text" placeholder="Nombre" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white">
-                <input id="in-price" type="number" placeholder="Precio ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white">
-                <button onclick="saveProduct()" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl uppercase text-xs">Añadir Producto</button>
-            </div>
-            <div id="edit-list" class="space-y-1"></div>
-        </div>
-    </div>
-
-    <!-- Notas -->
-    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-orange-400">📝 Notas del Día</h2><button onclick="closeModal('notes-modal')" class="text-2xl">✕</button></div>
-            <textarea id="notes-area" oninput="saveNotes()" class="w-full h-[60vh] p-8 bg-orange-50 rounded-[3rem] font-bold text-slate-700 outline-none border-none resize-none placeholder-orange-200" placeholder="Escribe recordatorios, pedidos, etc..."></textarea>
-        </div>
-    </div>
-
-    <!-- Gastos -->
-    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[150] p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-8"><h2 class="font-black uppercase text-[10px] tracking-widest text-red-400">💸 Gastos</h2><button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button></div>
-            <div class="bg-red-50 p-6 rounded-[2rem] mb-8">
-                <input id="exp-name" type="text" placeholder="Ej: Comida" class="w-full p-4 rounded-xl mb-3 font-bold text-sm bg-white">
-                <input id="exp-price" type="number" placeholder="Monto ($)" class="w-full p-4 rounded-xl mb-6 font-bold text-sm bg-white">
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="saveExpense('cash')" class="py-4 bg-[#10b981] text-white font-black rounded-xl uppercase text-[9px]">Efectivo</button>
-                    <button onclick="saveExpense('mp')" class="py-4 bg-[#0ea5e9] text-white font-black rounded-xl uppercase text-[9px]">M. Pago</button>
-                </div>
-            </div>
-            <div id="expenses-list" class="space-y-2"></div>
-        </div>
-    </div>
-
     <!-- Historial -->
     <div id="history-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
@@ -160,7 +160,7 @@
         </div>
     </div>
 
-    <!-- Reporte / Vista de Cierre -->
+    <!-- Reporte Detalle -->
     <div id="report-modal" class="hidden fixed inset-0 bg-white z-[250] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between mb-8 no-print items-center">
@@ -214,7 +214,6 @@
                 `).join('');
         }
 
-        // --- VENTAS ---
         function askConfirmation(id) {
             pendingItem = getSafe(currentBooth + '_products').find(p => p.id === id);
             currentQty = 1; updateQtyDisplay();
@@ -233,7 +232,6 @@
             closeModal('confirm-modal'); render();
         }
 
-        // --- STOCK ---
         function openConfig() { document.getElementById('config-modal').classList.remove('hidden'); renderEditList(); }
         function saveProduct() {
             const n = document.getElementById('in-name').value, p = parseInt(document.getElementById('in-price').value);
@@ -250,7 +248,7 @@
                     <div class="text-[10px] font-black uppercase"><p>${p.name}</p><p class="text-indigo-500">$${p.price}</p></div>
                     <button onclick="deleteProduct(${p.id})" class="text-red-400 font-black text-[9px] bg-red-50 px-3 py-2 rounded-xl">Eliminar</button>
                 </div>
-            `).join('');
+            `).join('') || '<p class="text-center py-20 text-slate-300 font-black uppercase text-[10px]">Sin productos</p>';
         }
         function deleteProduct(id) {
             const items = getSafe(currentBooth + '_products').filter(i => i.id !== id);
@@ -258,7 +256,6 @@
             renderEditList(); render();
         }
 
-        // --- GASTOS ---
         function openExpenses() { document.getElementById('expenses-modal').classList.remove('hidden'); renderExp(); }
         function saveExpense(method) {
             const n = document.getElementById('exp-name').value, p = parseInt(document.getElementById('exp-price').value);
@@ -277,7 +274,6 @@
             `).join('');
         }
 
-        // --- NOTAS ---
         function openNotes() {
             document.getElementById('notes-area').value = localStorage.getItem('feria_notes') || "";
             document.getElementById('notes-modal').classList.remove('hidden');
@@ -286,55 +282,81 @@
             localStorage.setItem('feria_notes', document.getElementById('notes-area').value);
         }
 
-        // --- HISTORIAL & CIERRE ---
+        // --- LÓGICA DE HISTORIAL CORREGIDA ---
         function openHistory() {
             const history = getSafe('feria_history');
-            document.getElementById('history-list').innerHTML = history.map(h => `
-                <div class="bg-white border border-slate-100 p-6 rounded-[2rem] flex justify-between items-center shadow-sm">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-800 uppercase">${h.fecha}</p>
-                        <p class="text-indigo-500 font-black text-xs mt-1">Total: ${h.totalCash} | ${h.totalMp}</p>
+            document.getElementById('history-list').innerHTML = history.map(h => {
+                // Determinar qué puesto se cerró
+                let title = "CIERRE MIXTO";
+                let borderColor = "border-slate-200";
+                let bgColor = "bg-white";
+
+                if (h.bijou && h.bijou.length > 0 && (!h.oki || h.oki.length === 0)) {
+                    title = "CIERRE: BIJOU ✨";
+                    borderColor = "border-pink-200";
+                } else if (h.oki && h.oki.length > 0 && (!h.bijou || h.bijou.length === 0)) {
+                    title = "CIERRE: OKIEDOKIE 🤖";
+                    borderColor = "border-blue-200";
+                }
+
+                return `
+                <div class="bg-white border-l-8 ${borderColor} p-6 rounded-2xl shadow-sm flex flex-col gap-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-800 uppercase tracking-widest">${title}</p>
+                            <p class="text-[9px] font-bold text-slate-400 mt-0.5">${h.fecha} a las ${h.hora}</p>
+                        </div>
+                        <button onclick='viewHistoryDetail(${JSON.stringify(h)})' class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[9px] font-black uppercase">Detalle</button>
                     </div>
-                    <button onclick='viewHistoryDetail(${JSON.stringify(h)})' class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase">Detalle</button>
+                    <div class="grid grid-cols-2 gap-2 border-t pt-3 border-slate-50">
+                        <div class="text-[10px] font-black text-emerald-600 uppercase">Efectivo: ${h.totalCash}</div>
+                        <div class="text-[10px] font-black text-sky-600 uppercase">M. Pago: ${h.totalMp}</div>
+                    </div>
                 </div>
-            `).join('') || '<p class="text-center py-20 text-slate-300 font-black uppercase text-[10px]">Sin cierres</p>';
+                `;
+            }).join('') || '<p class="text-center py-20 text-slate-300 font-black uppercase text-[10px]">No hay cierres guardados</p>';
             document.getElementById('history-modal').classList.remove('hidden');
         }
 
         function handleCloseDay() {
-            const b = getSafe('bijou_sales'), o = getSafe('okidokie_sales');
-            if (b.length === 0 && o.length === 0) return alert("Nada que cerrar hoy.");
-            if (confirm("¿Cerrar caja y guardar este día en el historial?")) {
+            const b = getSafe('bijou_sales'), o = getSafe('okidokie_sales'), g = getSafe('global_expenses');
+            if (b.length === 0 && o.length === 0 && g.length === 0) return alert("Nada que cerrar hoy.");
+            
+            if (confirm("¿Cerrar caja y guardar este registro?")) {
                 const closure = {
                     id: Date.now(), fecha: new Date().toLocaleDateString(),
                     hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                    bijou: b, oki: o, expenses: getSafe('global_expenses'),
+                    bijou: b, oki: o, expenses: g,
                     totalCash: document.getElementById('total-cash').innerText,
                     totalMp: document.getElementById('total-mp').innerText
                 };
                 const history = getSafe('feria_history');
                 history.unshift(closure);
                 localStorage.setItem('feria_history', JSON.stringify(history));
+                
+                // Reset
                 localStorage.setItem('bijou_sales', '[]'); localStorage.setItem('okidokie_sales', '[]'); localStorage.setItem('global_expenses', '[]');
-                localStorage.setItem('feria_notes', ""); // Limpiar notas al cerrar día
-                render(); alert("Día guardado con éxito.");
+                localStorage.setItem('feria_notes', ""); 
+                render(); alert("Registro guardado con éxito.");
             }
         }
 
         function viewHistoryDetail(h) {
             let html = `
-                <div class="text-center mb-8"><h2 class="font-black text-xl uppercase">${h.fecha}</h2><p class="text-[9px] text-slate-400 uppercase font-bold">Cierre: ${h.hora}</p></div>
+                <div class="text-center mb-8"><h2 class="font-black text-xl uppercase">${h.fecha}</h2><p class="text-[9px] text-slate-400 uppercase font-bold">Cierre efectuado a las ${h.hora}</p></div>
                 <div class="space-y-6">
-                    <div><p class="text-[9px] font-black text-slate-400 border-b mb-2 uppercase">A Tu Estilo</p>
-                    ${h.bijou.map(s => `<div class="flex justify-between text-[10px] py-1"><span>${s.hora} - ${s.name} x${s.qty}</span><span class="font-bold">$${s.totalPrice}</span></div>`).join('') || 'Sin ventas'}</div>
-                    <div><p class="text-[9px] font-black text-slate-400 border-b mb-2 uppercase">Okiedokie</p>
-                    ${h.oki.map(s => `<div class="flex justify-between text-[10px] py-1"><span>${s.hora} - ${s.name} x${s.qty}</span><span class="font-bold">$${s.totalPrice}</span></div>`).join('') || 'Sin ventas'}</div>
-                    <div><p class="text-[9px] font-black text-red-400 border-b mb-2 uppercase">Gastos</p>
-                    ${h.expenses.map(e => `<div class="flex justify-between text-[10px] py-1 text-red-500 italic"><span>${e.name}</span><span>-$${e.amount}</span></div>`).join('') || 'Sin gastos'}</div>
+                    <div><p class="text-[9px] font-black text-pink-500 border-b pb-1 mb-2 uppercase tracking-tighter">✨ VENTAS A TU ESTILO</p>
+                    ${h.bijou.map(s => `<div class="flex justify-between text-[11px] py-1 border-b border-slate-50 last:border-0"><span>${s.hora} - ${s.name} x${s.qty}</span><span class="font-black">$${s.totalPrice.toLocaleString()}</span></div>`).join('') || '<p class="text-[10px] italic text-slate-300">Sin ventas registradas</p>'}</div>
+                    
+                    <div><p class="text-[9px] font-black text-indigo-500 border-b pb-1 mb-2 uppercase tracking-tighter">🤖 VENTAS OKIEDOKIE</p>
+                    ${h.oki.map(s => `<div class="flex justify-between text-[11px] py-1 border-b border-slate-50 last:border-0"><span>${s.hora} - ${s.name} x${s.qty}</span><span class="font-black">$${s.totalPrice.toLocaleString()}</span></div>`).join('') || '<p class="text-[10px] italic text-slate-300">Sin ventas registradas</p>'}</div>
+                    
+                    <div><p class="text-[9px] font-black text-red-400 border-b pb-1 mb-2 uppercase tracking-tighter">💸 GASTOS</p>
+                    ${h.expenses.map(e => `<div class="flex justify-between text-[11px] py-1 text-red-500 italic"><span>${e.name} (${e.method})</span><span class="font-bold">-$${e.amount}</span></div>`).join('') || '<p class="text-[10px] italic text-slate-300">Sin gastos</p>'}</div>
                 </div>
-                <div class="mt-8 p-6 bg-slate-900 rounded-[2rem] text-white text-xs font-black uppercase tracking-tight">
-                    <p class="flex justify-between mb-2"><span>Efectivo:</span> <span>${h.totalCash}</span></p>
-                    <p class="flex justify-between"><span>M. Pago:</span> <span>${h.totalMp}</span></p>
+                <div class="mt-8 p-6 bg-slate-900 rounded-[2.5rem] text-white text-[11px] font-black uppercase tracking-tight shadow-xl">
+                    <p class="flex justify-between mb-2"><span>Efectivo Total:</span> <span class="text-emerald-400">${h.totalCash}</span></p>
+                    <p class="flex justify-between"><span>M. Pago Total:</span> <span class="text-sky-400">${h.totalMp}</span></p>
                 </div>
             `;
             document.getElementById('report-content').innerHTML = html;
@@ -342,7 +364,7 @@
         }
 
         function generateReport() {
-            const h = { fecha: "Hoy (En curso)", hora: "Actual", bijou: getSafe('bijou_sales'), oki: getSafe('okidokie_sales'), expenses: getSafe('global_expenses'), totalCash: document.getElementById('total-cash').innerText, totalMp: document.getElementById('total-mp').innerText };
+            const h = { fecha: "Hoy (En curso)", hora: "En proceso", bijou: getSafe('bijou_sales'), oki: getSafe('okidokie_sales'), expenses: getSafe('global_expenses'), totalCash: document.getElementById('total-cash').innerText, totalMp: document.getElementById('total-mp').innerText };
             viewHistoryDetail(h);
         }
 
