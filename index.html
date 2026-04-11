@@ -77,21 +77,21 @@
             <button onclick="setBooth('oki')" id="tab-oki" class="flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400 transition-all">🤖 OKIEDOKIE</button>
         </nav>
 
-        <!-- Totales -->
+        <!-- Totales Específicos por Puesto -->
         <div class="grid grid-cols-2 gap-3 mb-6 no-print">
             <div class="bg-[#10b981] p-5 rounded-[1.8rem] text-white card-shadow">
-                <p class="text-[9px] font-bold uppercase opacity-90 mb-1">Efectivo Real</p>
+                <p class="text-[9px] font-bold uppercase opacity-90 mb-1">Efectivo Puesto</p>
                 <p id="cash-display" class="text-2xl font-extrabold">$0</p>
             </div>
             <div class="bg-[#0ea5e9] p-5 rounded-[1.8rem] text-white card-shadow">
-                <p class="text-[9px] font-bold uppercase opacity-90 mb-1">M. Pago Real</p>
+                <p class="text-[9px] font-bold uppercase opacity-90 mb-1">M. Pago Puesto</p>
                 <p id="mp-display" class="text-2xl font-extrabold">$0</p>
             </div>
         </div>
 
         <!-- Buscador -->
         <div class="relative mb-8 no-print">
-            <input type="text" placeholder="🔍 Buscar producto..." class="w-full py-4 px-6 rounded-2xl bg-white border border-slate-100 shadow-sm outline-none font-medium text-slate-500">
+            <input type="text" id="product-search" oninput="render()" placeholder="🔍 Buscar producto..." class="w-full py-4 px-6 rounded-2xl bg-white border border-slate-100 shadow-sm outline-none font-medium text-slate-500">
         </div>
 
         <!-- Grid de Productos -->
@@ -114,7 +114,7 @@
             </button>
 
             <button onclick="confirmCloseDay()" class="w-full py-4 bg-[#fef2f2] text-[#ef4444] font-bold rounded-2xl flex items-center justify-center gap-2 uppercase text-[10px]">
-                ⚠️ CIERRE DE CAJA
+                ⚠️ CIERRE DE CAJA (HOY)
             </button>
         </div>
     </div>
@@ -239,17 +239,28 @@
         }
 
         function render() {
+            // CORRECCIÓN: Calcular totales SOLO para el puesto actual (currentBooth)
             let cash = 0, mp = 0;
-            ['bijou', 'oki'].forEach(b => {
-                db.get(`${b}_sales`).forEach(s => { if(s.m === 'cash') cash += s.t; else mp += s.t; });
-                db.get(`${b}_expenses`).forEach(e => { if(e.m === 'cash') cash -= e.a; else mp -= e.a; });
+            
+            db.get(`${currentBooth}_sales`).forEach(s => { 
+                if(s.m === 'cash') cash += s.t; else mp += s.t; 
             });
+            
+            db.get(`${currentBooth}_expenses`).forEach(e => { 
+                if(e.m === 'cash') cash -= e.a; else mp -= e.a; 
+            });
+
             document.getElementById('cash-display').innerText = `$${cash.toLocaleString()}`;
             document.getElementById('mp-display').innerText = `$${mp.toLocaleString()}`;
 
+            // Buscador
+            const searchQuery = document.getElementById('product-search').value.toLowerCase();
             const grid = document.getElementById('products-grid');
             const prods = db.get(`${currentBooth}_products`);
-            grid.innerHTML = prods.map(p => `
+            
+            const filteredProds = prods.filter(p => p.n.toLowerCase().includes(searchQuery));
+
+            grid.innerHTML = filteredProds.map(p => `
                 <button onclick="openSale(${p.id})" class="product-card card-shadow">
                     <span class="text-[11px] font-bold uppercase text-slate-400 mb-2">${p.n}</span>
                     <span class="text-xl font-extrabold text-[#6366f1]">$${p.p.toLocaleString()}</span>
@@ -309,17 +320,17 @@
                 <div class="space-y-8">
                     <div>
                         <h3 class="text-[10px] font-black text-pink-500 uppercase border-b pb-2 mb-3">✨ A TU ESTILO.</h3>
-                        ${data.vB.length ? data.vB.map(v => `<div class="flex justify-between text-xs font-bold py-1"><span>${v.n} x${v.q} <span class="text-[9px] text-slate-300 ml-1">${v.h}</span></span><span>$${v.t.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin ventas</p>'}
+                        ${data.vB && data.vB.length ? data.vB.map(v => `<div class="flex justify-between text-xs font-bold py-1"><span>${v.n} x${v.q} <span class="text-[9px] text-slate-300 ml-1">${v.h}</span></span><span>$${v.t.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin ventas</p>'}
                     </div>
 
                     <div>
                         <h3 class="text-[10px] font-black text-indigo-500 uppercase border-b pb-2 mb-3">🤖 OKIEDOKIE</h3>
-                        ${data.vO.length ? data.vO.map(v => `<div class="flex justify-between text-xs font-bold py-1"><span>${v.n} x${v.q} <span class="text-[9px] text-slate-300 ml-1">${v.h}</span></span><span>$${v.t.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin ventas</p>'}
+                        ${data.vO && data.vO.length ? data.vO.map(v => `<div class="flex justify-between text-xs font-bold py-1"><span>${v.n} x${v.q} <span class="text-[9px] text-slate-300 ml-1">${v.h}</span></span><span>$${v.t.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin ventas</p>'}
                     </div>
 
                     <div>
                         <h3 class="text-[10px] font-black text-red-500 uppercase border-b pb-2 mb-3">💸 GASTOS</h3>
-                        ${[...data.gB, ...data.gO].length ? [...data.gB, ...data.gO].map(g => `<div class="flex justify-between text-xs font-bold py-1"><span>${g.d}</span><span>-$${g.a.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin gastos</p>'}
+                        ${((data.gB || []).concat(data.gO || [])).length ? (data.gB || []).concat(data.gO || []).map(g => `<div class="flex justify-between text-xs font-bold py-1"><span>${g.d}</span><span>-$${g.a.toLocaleString()}</span></div>`).join('') : '<p class="text-[10px] text-slate-300 italic">Sin gastos</p>'}
                     </div>
                 </div>
 
@@ -338,32 +349,42 @@
 
         function showTodayReport() {
             const vB = db.get('bijou_sales'), vO = db.get('oki_sales'), gB = db.get('bijou_expenses'), gO = db.get('oki_expenses');
-            const totalCash = document.getElementById('cash-display').innerText;
-            const totalMp = document.getElementById('mp-display').innerText;
-            buildReportHTML({ fecha: 'HOY', hora: 'Cierre Actual', vB, vO, gB, gO, totalCash, totalMp });
+            
+            // Calculamos totales actuales del reporte hoy (Suma de ambos para el reporte general)
+            let totalCash = 0, totalMp = 0;
+            [...vB, ...vO].forEach(v => { if(v.m === 'cash') totalCash += v.t; else totalMp += v.t; });
+            [...gB, ...gO].forEach(g => { if(g.m === 'cash') totalCash -= g.a; else totalMp -= g.a; });
+
+            buildReportHTML({ 
+                fecha: 'HOY (GENERAL)', 
+                hora: 'Cierre Actual Provisorio', 
+                vB, vO, gB, gO, 
+                totalCash: `$${totalCash.toLocaleString()}`, 
+                totalMp: `$${totalMp.toLocaleString()}` 
+            });
             openModal('report-modal');
         }
 
         function confirmCloseDay() {
-            if(!confirm("¿Cerrar día? Se guardará en historial.")) return;
+            if(!confirm("¿Cerrar día? Se guardará en historial y se limpiarán las ventas actuales de AMBOS puestos.")) return;
             const history = db.get('feria_history_v4');
             const vB = db.get('bijou_sales'), vO = db.get('oki_sales');
+            const gB = db.get('bijou_expenses'), gO = db.get('oki_expenses');
             
-            let cierreNombre = currentBooth === 'bijou' ? '✨ A TU ESTILO.' : '🤖 OKIEDOKIE';
-            if(vB.length > 0 && vO.length === 0) cierreNombre = '✨ A TU ESTILO.';
-            if(vO.length > 0 && vB.length === 0) cierreNombre = '🤖 OKIEDOKIE';
+            let totalCash = 0, totalMp = 0;
+            [...vB, ...vO].forEach(v => { if(v.m === 'cash') totalCash += v.t; else totalMp += v.t; });
+            [...gB, ...gO].forEach(g => { if(g.m === 'cash') totalCash -= g.a; else totalMp -= g.a; });
 
             history.unshift({
                 id: Date.now(),
-                nombre: cierreNombre,
+                nombre: "CIERRE TOTAL FERIA",
                 fecha: new Date().toLocaleDateString(),
                 hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                vB, vO, 
-                gB: db.get('bijou_expenses'), 
-                gO: db.get('oki_expenses'),
-                totalCash: document.getElementById('cash-display').innerText,
-                totalMp: document.getElementById('mp-display').innerText
+                vB, vO, gB, gO,
+                totalCash: `$${totalCash.toLocaleString()}`,
+                totalMp: `$${totalMp.toLocaleString()}`
             });
+            
             db.set('feria_history_v4', history);
             ['bijou', 'oki'].forEach(b => { db.set(`${b}_sales`, []); db.set(`${b}_expenses`, []); });
             render();
@@ -377,7 +398,7 @@
                 container.innerHTML = `<div class="py-20 text-center text-slate-300 font-bold uppercase text-[10px]">Sin cierres</div>`;
             } else {
                 container.innerHTML = history.map(h => `
-                    <div class="history-item card-shadow ${h.nombre.includes('ESTILO') ? 'history-border-bijou' : 'history-border-oki'}">
+                    <div class="history-item card-shadow">
                         <div class="flex-1">
                             <p class="font-black text-[9px] text-slate-400 uppercase mb-0.5">${h.nombre}</p>
                             <p class="font-black text-xs uppercase text-slate-800">${h.fecha} — ${h.hora}</p>
@@ -388,7 +409,6 @@
                         </div>
                         <div class="flex flex-col gap-1">
                             <button onclick='showHistoryDetail(${JSON.stringify(h)})' class="bg-[#1e293b] text-white px-5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest">Detalle</button>
-                            <!-- Botón para borrar cierre equivocado -->
                             <button onclick='deleteHistoryItem(${h.id})' class="text-red-500 text-[8px] font-bold uppercase mt-1">Eliminar</button>
                         </div>
                     </div>
@@ -398,7 +418,7 @@
         }
 
         function deleteHistoryItem(id) {
-            if(!confirm("¿Borrar este cierre del historial? Esta acción no se puede deshacer.")) return;
+            if(!confirm("¿Borrar este cierre?")) return;
             const history = db.get('feria_history_v4').filter(h => h.id !== id);
             db.set('feria_history_v4', history);
             openHistory();
@@ -437,30 +457,17 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         
         function resetToday() { 
-            if(confirm("¿Restablecer el día? Si hiciste un cierre recién, se borrará del historial para que puedas corregirlo.")) { 
-                // Borrar datos actuales
+            if(confirm("¿Limpiar las ventas actuales?")) { 
                 ['bijou', 'oki'].forEach(b => { 
                     db.set(`${b}_sales`, []); 
                     db.set(`${b}_expenses`, []); 
                 }); 
-                
-                // OPCIONAL: Borrar el último cierre si fue hace menos de 10 minutos (por error)
-                const history = db.get('feria_history_v4');
-                if(history.length > 0) {
-                    const lastCierre = history[0];
-                    const diff = Date.now() - lastCierre.id;
-                    if(diff < 600000) { // 10 minutos
-                        history.shift();
-                        db.set('feria_history_v4', history);
-                    }
-                }
-                
                 render(); 
                 closeModal('history-modal'); 
             } 
         }
 
-        function clearAllHistory() { if(confirm("¿Borrar todo el historial permanentemente?")) { db.set('feria_history_v4', []); openHistory(); } }
+        function clearAllHistory() { if(confirm("¿Borrar todo el historial?")) { db.set('feria_history_v4', []); openHistory(); } }
 
         window.onload = () => {
             if(db.get('bijou_products').length === 0) {
@@ -469,7 +476,11 @@
                     {id:3, n:'Cadenitas con Imán', p:8000}, {id:4, n:'Pulsera Cadenita', p:3000}
                 ]);
             }
-            render();
+            if(db.get('oki_products').length === 0) {
+                db.set('oki_products', [
+                    {id:101, n:'Robot Juguete', p:5000}, {id:102, n:'Stickers Oki', p:500}
+                ]);
+            }
             setBooth('bijou');
         };
     </script>
