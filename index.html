@@ -76,11 +76,11 @@
         <!-- Totales -->
         <div class="grid grid-cols-2 gap-3 mb-4 no-print">
             <div class="bg-[#10b981] p-5 rounded-[1.8rem] text-white card-shadow">
-                <p id="label-cash" class="text-[9px] font-bold uppercase opacity-90 mb-1">Efectivo</p>
+                <p class="text-[9px] font-bold uppercase opacity-90 mb-1">Efectivo</p>
                 <p id="cash-display" class="text-2xl font-extrabold">$0</p>
             </div>
             <div class="bg-[#0ea5e9] p-5 rounded-[1.8rem] text-white card-shadow">
-                <p id="label-mp" class="text-[9px] font-bold uppercase opacity-90 mb-1">M. Pago</p>
+                <p class="text-[9px] font-bold uppercase opacity-90 mb-1">M. Pago</p>
                 <p id="mp-display" class="text-2xl font-extrabold">$0</p>
             </div>
         </div>
@@ -92,7 +92,7 @@
             <button onclick="openModal('expenses-modal')" class="btn-action bg-white border border-slate-100 text-[#dc2626] shadow-sm">💸 GASTOS</button>
         </div>
 
-        <!-- Buscador con X y Limpieza Automática -->
+        <!-- Buscador con X -->
         <div class="space-y-3 mb-8 no-print">
             <div class="relative flex items-center">
                 <input type="text" id="product-search" oninput="handleSearch()" placeholder="🔍 Buscar producto..." class="w-full py-4 px-6 pr-12 rounded-2xl bg-white border border-slate-100 shadow-sm outline-none font-medium text-slate-500">
@@ -105,15 +105,13 @@
             </div>
         </div>
 
-        <!-- Registro de Ventas en Vivo -->
+        <!-- Ventas Recientes -->
         <div class="mb-8 no-print">
             <div class="flex justify-between items-center mb-3">
                 <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-400">Ventas Recientes</h3>
                 <button onclick="openModal('sales-manager-modal'); renderSalesManager();" class="text-[9px] font-bold text-indigo-600 uppercase underline">Administrar</button>
             </div>
-            <div id="real-time-sales" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                <!-- Se llena dinámicamente -->
-            </div>
+            <div id="real-time-sales" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"></div>
         </div>
 
         <!-- Grid de Productos -->
@@ -128,22 +126,18 @@
                 📂 HISTORIAL DE CIERRES
             </button>
             <button onclick="confirmCloseBooth()" class="w-full py-4 bg-red-50 text-red-500 font-bold rounded-2xl flex items-center justify-center gap-2 uppercase text-[10px] border border-red-100">
-                ⚠️ CIERRE DE CAJA (ESTE PUESTO)
+                ⚠️ FINALIZAR JORNADA Y CERRAR CAJA
             </button>
         </div>
     </div>
 
-    <!-- MODALES -->
-
-    <!-- Modal Administrador de Ventas (BORRAR Y EDITAR) -->
+    <!-- MODAL ADMINISTRADOR DE VENTAS -->
     <div id="sales-manager-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="font-bold uppercase text-xs">🛠️ Control de Ventas</h2>
                 <button onclick="closeModal('sales-manager-modal')" class="text-2xl">✕</button>
             </div>
-            
-            <!-- Editor rápido de venta -->
             <div id="sale-editor-form" class="hidden bg-slate-50 p-6 rounded-[2rem] mb-8 border border-slate-100 shadow-inner">
                 <h4 class="text-[10px] font-black uppercase text-indigo-500 mb-4">Editar Venta</h4>
                 <input type="hidden" id="edit-sale-id">
@@ -153,7 +147,7 @@
                         <input id="edit-sale-qty" type="number" class="w-full p-4 rounded-xl font-bold outline-none">
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[9px] font-bold text-slate-400 uppercase ml-2">Precio Total $</label>
+                        <label class="text-[9px] font-bold text-slate-400 uppercase ml-2">Total $</label>
                         <input id="edit-sale-total" type="number" class="w-full p-4 rounded-xl font-bold outline-none">
                     </div>
                 </div>
@@ -162,13 +156,11 @@
                     <button onclick="closeSaleEditor()" class="py-4 bg-slate-200 text-slate-500 font-bold rounded-xl uppercase text-[10px]">Cancelar</button>
                 </div>
             </div>
-
-            <p class="text-[10px] text-slate-400 uppercase font-bold mb-4">Lista de transacciones</p>
             <div id="sales-manager-list" class="space-y-3"></div>
         </div>
     </div>
 
-    <!-- Venta -->
+    <!-- MODAL VENTA -->
     <div id="sale-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] flex items-end justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 card-shadow text-center">
             <h3 id="sale-product-name" class="font-extrabold uppercase text-slate-800 text-lg mb-2"></h3>
@@ -179,26 +171,26 @@
                 <button onclick="changeQty(1)" class="w-12 h-12 bg-slate-100 rounded-full text-2xl font-bold">+</button>
             </div>
             <div class="grid gap-3">
-                <button id="btn-cash" onclick="processSale('cash')" class="py-5 bg-emerald-500 text-white font-bold rounded-2xl uppercase text-xs tracking-widest">Efectivo</button>
-                <button id="btn-mp" onclick="processSale('mp')" class="py-5 bg-sky-500 text-white font-bold rounded-2xl uppercase text-xs tracking-widest">Mercado Pago</button>
+                <button onclick="processSale('cash')" class="py-5 bg-emerald-500 text-white font-bold rounded-2xl uppercase text-xs">Efectivo</button>
+                <button onclick="processSale('mp')" class="py-5 bg-sky-500 text-white font-bold rounded-2xl uppercase text-xs">Mercado Pago</button>
                 <button onclick="closeModal('sale-modal')" class="py-3 text-slate-400 font-bold text-[10px] uppercase">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <!-- Stock -->
+    <!-- MODAL STOCK -->
     <div id="stock-modal" class="hidden fixed inset-0 bg-white z-[100] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="font-bold uppercase text-xs">📦 Gestión de Stock</h2>
+                <h2 class="font-bold uppercase text-xs">📦 Stock</h2>
                 <button onclick="closeModal('stock-modal')" class="text-2xl">✕</button>
             </div>
-            <div class="bg-slate-50 p-6 rounded-[2rem] mb-6 space-y-3 border border-slate-100 shadow-sm">
+            <div class="bg-slate-50 p-6 rounded-[2rem] mb-6 space-y-3">
                 <input id="stock-id-edit" type="hidden">
-                <input id="stock-name" type="text" placeholder="Producto" class="w-full p-4 rounded-xl outline-none font-bold">
+                <input id="stock-name" type="text" placeholder="Producto" class="w-full p-4 rounded-xl font-bold">
                 <div class="grid grid-cols-2 gap-3">
-                    <input id="stock-price" type="number" placeholder="Precio $" class="w-full p-4 rounded-xl outline-none font-bold">
-                    <input id="stock-qty" type="number" placeholder="Cantidad" class="w-full p-4 rounded-xl outline-none font-bold">
+                    <input id="stock-price" type="number" placeholder="Precio $" class="w-full p-4 rounded-xl font-bold">
+                    <input id="stock-qty" type="number" placeholder="Cant." class="w-full p-4 rounded-xl font-bold">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="saveProduct()" class="py-4 bg-black text-white font-bold rounded-xl uppercase text-[10px]">Guardar</button>
@@ -209,26 +201,82 @@
         </div>
     </div>
 
-    <!-- Otros Modales -->
-    <div id="history-modal" class="hidden fixed inset-0 bg-white z-[100] p-6 overflow-y-auto"><div class="max-w-md mx-auto"><div class="flex justify-between items-center mb-8"><h2 class="font-bold uppercase text-[10px] text-slate-400">Historial</h2><button onclick="closeModal('history-modal')" class="text-2xl">✕</button></div><div id="history-content" class="space-y-3"></div></div></div>
-    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[100] p-6"><div class="max-w-md mx-auto"><div class="flex justify-between items-center mb-8"><h2 class="font-bold text-amber-600 uppercase text-xs">📝 Notas</h2><button onclick="closeModal('notes-modal')" class="text-2xl">✕</button></div><textarea id="notes-input" oninput="saveNotes()" class="w-full h-[60vh] p-6 bg-amber-50 rounded-[2rem] border-none outline-none font-medium text-amber-900"></textarea></div></div>
-    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[100] p-6"><div class="max-w-md mx-auto"><div class="flex justify-between items-center mb-8"><h2 class="font-bold text-red-500 uppercase text-xs">💸 Gastos</h2><button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button></div><input id="exp-desc" type="text" placeholder="Concepto" class="w-full p-4 bg-slate-50 rounded-2xl mb-3 outline-none font-bold"><input id="exp-amt" type="number" placeholder="Monto $" class="w-full p-4 bg-slate-50 rounded-2xl mb-6 outline-none font-bold"><div class="grid grid-cols-2 gap-3"><button onclick="saveExpense('cash')" class="py-4 bg-emerald-500 text-white font-bold rounded-2xl text-[10px] uppercase">Efectivo</button><button onclick="saveExpense('mp')" class="py-4 bg-sky-500 text-white font-bold rounded-2xl text-[10px] uppercase">M. Pago</button></div></div></div>
-    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto"><div class="max-w-md mx-auto"><div class="flex justify-between items-center no-print mb-8"><button onclick="closeModal('report-modal')" class="text-slate-400 font-bold uppercase text-[10px]">✕</button><button onclick="window.print()" class="bg-black text-white px-4 py-2 rounded-xl text-[10px]">IMPRIMIR</button></div><div id="report-content"></div></div></div>
+    <!-- MODAL HISTORIAL -->
+    <div id="history-modal" class="hidden fixed inset-0 bg-white z-[100] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-bold uppercase text-xs">📂 Historial de Cierres</h2>
+                <button onclick="closeModal('history-modal')" class="text-2xl">✕</button>
+            </div>
+            <div id="history-content" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- MODAL NOTAS -->
+    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[100] p-6">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-bold text-amber-600 uppercase text-xs">📝 Notas</h2>
+                <button onclick="closeModal('notes-modal')" class="text-2xl">✕</button>
+            </div>
+            <textarea id="notes-input" oninput="saveNotes()" class="w-full h-[65vh] p-6 bg-amber-50 rounded-[2rem] border-none outline-none font-medium text-amber-900"></textarea>
+        </div>
+    </div>
+
+    <!-- MODAL GASTOS -->
+    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[100] p-6">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-bold text-red-500 uppercase text-xs">💸 Cargar Gasto</h2>
+                <button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button>
+            </div>
+            <input id="exp-desc" type="text" placeholder="Concepto (ej: Comida)" class="w-full p-4 bg-slate-50 rounded-2xl mb-3 font-bold">
+            <input id="exp-amt" type="number" placeholder="Monto $" class="w-full p-4 bg-slate-50 rounded-2xl mb-6 font-bold">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="saveExpense('cash')" class="py-4 bg-emerald-500 text-white font-bold rounded-2xl text-[10px] uppercase">Efectivo</button>
+                <button onclick="saveExpense('mp')" class="py-4 bg-sky-500 text-white font-bold rounded-2xl text-[10px] uppercase">M. Pago</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL REPORTE -->
+    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-center no-print mb-8">
+                <button onclick="closeModal('report-modal')" class="text-slate-400 font-bold uppercase text-[10px]">✕</button>
+                <button onclick="window.print()" class="bg-black text-white px-4 py-2 rounded-xl text-[10px]">IMPRIMIR</button>
+            </div>
+            <div id="report-content"></div>
+        </div>
+    </div>
 
     <script>
+        // --- CONFIGURACIÓN Y ESTADO ---
         let currentBooth = 'bijou';
         let selectedProduct = null;
         let selectedQty = 1;
 
         const db = {
-            get: (key) => JSON.parse(localStorage.getItem(key)) || [],
-            set: (key, val) => localStorage.setItem(key, JSON.stringify(val))
+            get: (key) => {
+                try {
+                    return JSON.parse(localStorage.getItem(key)) || [];
+                } catch(e) { return []; }
+            },
+            set: (key, val) => {
+                try {
+                    localStorage.setItem(key, JSON.stringify(val));
+                } catch(e) { console.error("Error guardando datos", e); }
+            }
         };
 
-        function changeBooth(b) {
-            clearSearch();
-            setBooth(b);
-        }
+        // --- INICIO ---
+        window.onload = () => {
+            if(db.get('bijou_products').length === 0) {
+                db.set('bijou_products', [{id:1, n:'Ejemplo Bijou', p:1000, s:10}]);
+                db.set('oki_products', [{id:101, n:'Ejemplo Oki', p:5000, s:5}]);
+            }
+            setBooth('bijou');
+        };
 
         function setBooth(b) {
             currentBooth = b;
@@ -245,6 +293,12 @@
             renderRealTimeSales();
         }
 
+        function changeBooth(b) {
+            clearSearch();
+            setBooth(b);
+        }
+
+        // --- BUSCADOR ---
         function clearSearch() {
             const input = document.getElementById('product-search');
             input.value = "";
@@ -256,8 +310,8 @@
         function handleSearch() {
             const q = document.getElementById('product-search').value;
             const clearBtn = document.getElementById('clear-search');
-            const prods = db.get(`${currentBooth}_products`);
             const quickAdd = document.getElementById('quick-add-container');
+            const prods = db.get(`${currentBooth}_products`);
             
             if(q.length > 0) clearBtn.classList.remove('hidden');
             else clearBtn.classList.add('hidden');
@@ -272,46 +326,42 @@
             render();
         }
 
+        // --- RENDER PRINCIPAL ---
         function render() {
-            let boothCash = 0, boothMp = 0;
-            db.get(`${currentBooth}_sales`).forEach(s => { if(s.m === 'cash') boothCash += s.t; else boothMp += s.t; });
-            db.get(`${currentBooth}_expenses`).forEach(e => { if(e.m === 'cash') boothCash -= e.a; else boothMp -= e.a; });
+            let bCash = 0, bMp = 0;
+            const sales = db.get(`${currentBooth}_sales`);
+            const expenses = db.get(`${currentBooth}_expenses`);
+            
+            sales.forEach(s => { if(s.m === 'cash') bCash += s.t; else bMp += s.t; });
+            expenses.forEach(e => { if(e.m === 'cash') bCash -= e.a; else bMp -= e.a; });
 
-            document.getElementById('cash-display').innerText = `$${boothCash.toLocaleString()}`;
-            document.getElementById('mp-display').innerText = `$${boothMp.toLocaleString()}`;
+            document.getElementById('cash-display').innerText = `$${bCash.toLocaleString()}`;
+            document.getElementById('mp-display').innerText = `$${bMp.toLocaleString()}`;
 
             const q = document.getElementById('product-search').value.toLowerCase();
-            const grid = document.getElementById('products-grid');
             const prods = db.get(`${currentBooth}_products`);
+            const grid = document.getElementById('products-grid');
             
             grid.innerHTML = prods.filter(p => p.n.toLowerCase().includes(q)).map(p => {
                 const isOut = p.s <= 0;
                 return `
                 <button onclick="openSale(${p.id})" class="product-card card-shadow ${isOut ? 'out-of-stock' : ''}">
                     <span class="badge-stock ${isOut ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500'}">
-                        ${isOut ? 'REPONER' : p.s + ' unid.'}
+                        ${isOut ? 'SIN STOCK' : p.s + ' u.'}
                     </span>
-                    <span class="text-[11px] font-bold uppercase text-slate-400 mb-2">${p.n}</span>
+                    <span class="text-[11px] font-bold uppercase text-slate-400 mb-2 truncate w-full">${p.n}</span>
                     <span class="text-xl font-extrabold text-[#6366f1]">$${p.p.toLocaleString()}</span>
                 </button>
             `}).join('');
         }
 
+        // --- VENTAS ---
         function openSale(id) {
             selectedProduct = db.get(`${currentBooth}_products`).find(p => p.id === id);
             selectedQty = 1;
             document.getElementById('sale-product-name').innerText = selectedProduct.n;
             document.getElementById('sale-qty').innerText = "1";
-            
-            const warning = document.getElementById('sale-stock-warning');
-            const bCash = document.getElementById('btn-cash');
-            const bMp = document.getElementById('btn-mp');
-            
-            if(selectedProduct.s <= 0) {
-                warning.innerText = "¡SIN STOCK! ¿Vender igual?";
-            } else {
-                warning.innerText = "";
-            }
+            document.getElementById('sale-stock-warning').innerText = selectedProduct.s <= 0 ? "¡VENDIENDO SIN STOCK!" : "";
             openModal('sale-modal');
         }
 
@@ -337,102 +387,76 @@
             renderRealTimeSales();
         }
 
-        // --- ADMINISTRACIÓN DE VENTAS CON EDICIÓN ---
+        function changeQty(v) { selectedQty = Math.max(1, selectedQty + v); document.getElementById('sale-qty').innerText = selectedQty; }
+
+        // --- ADMINISTRACIÓN Y EDICIÓN ---
         function renderSalesManager() {
             const sales = db.get(`${currentBooth}_sales`);
             const container = document.getElementById('sales-manager-list');
-            
             if(sales.length === 0) {
-                container.innerHTML = `<p class="text-center py-20 text-slate-300 font-bold uppercase text-[10px]">No hay ventas hoy</p>`;
+                container.innerHTML = `<p class="text-center py-10 text-slate-300 uppercase text-[10px] font-bold">No hay ventas registradas hoy</p>`;
                 return;
             }
-
             container.innerHTML = sales.map(s => `
                 <div class="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
-                    <div class="text-left">
+                    <div>
                         <p class="text-[9px] font-bold text-slate-400 uppercase">${s.h} - ${s.m==='cash'?'EFECTIVO':'M.PAGO'}</p>
                         <p class="font-black text-[11px] uppercase">${s.n} (x${s.q})</p>
-                        <p class="font-bold text-indigo-500 text-[10px]">$${s.t.toLocaleString()}</p>
+                        <p class="font-bold text-indigo-500 text-[10px]">$${s.t}</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="openSaleEditor(${s.id})" class="w-10 h-10 flex items-center justify-center bg-indigo-50 text-indigo-500 rounded-xl font-bold">✏️</button>
-                        <button onclick="deleteSale(${s.id})" class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-500 rounded-xl font-bold">✕</button>
+                        <button onclick="openSaleEditor(${s.id})" class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl font-bold flex items-center justify-center">✏️</button>
+                        <button onclick="deleteSale(${s.id})" class="w-10 h-10 bg-red-50 text-red-500 rounded-xl font-bold flex items-center justify-center">✕</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function openSaleEditor(saleId) {
-            const sales = db.get(`${currentBooth}_sales`);
-            const sale = sales.find(s => s.id === saleId);
+        function openSaleEditor(id) {
+            const sale = db.get(`${currentBooth}_sales`).find(s => s.id === id);
             if(!sale) return;
-
             document.getElementById('edit-sale-id').value = sale.id;
             document.getElementById('edit-sale-qty').value = sale.q;
             document.getElementById('edit-sale-total').value = sale.t;
-            
             document.getElementById('sale-editor-form').classList.remove('hidden');
-            // Scroll al inicio del modal para ver el formulario
-            document.getElementById('sales-manager-modal').scrollTo({top: 0, behavior: 'smooth'});
+            document.getElementById('sales-manager-modal').scrollTo(0,0);
         }
 
-        function closeSaleEditor() {
-            document.getElementById('sale-editor-form').classList.add('hidden');
-        }
+        function closeSaleEditor() { document.getElementById('sale-editor-form').classList.add('hidden'); }
 
         function saveSaleEdit() {
-            const saleId = parseInt(document.getElementById('edit-sale-id').value);
-            const newQty = parseInt(document.getElementById('edit-sale-qty').value);
-            const newTotal = parseInt(document.getElementById('edit-sale-total').value);
-
-            if(isNaN(newQty) || isNaN(newTotal) || newQty < 1) return;
-
+            const id = parseInt(document.getElementById('edit-sale-id').value);
+            const nQ = parseInt(document.getElementById('edit-sale-qty').value);
+            const nT = parseInt(document.getElementById('edit-sale-total').value);
             let sales = db.get(`${currentBooth}_sales`);
-            const saleIndex = sales.findIndex(s => s.id === saleId);
-            if(saleIndex === -1) return;
+            const sIdx = sales.findIndex(s => s.id === id);
+            if(sIdx === -1) return;
 
-            const oldSale = sales[saleIndex];
-            const qtyDiff = newQty - oldSale.q; // Diferencia para ajustar stock
-
-            // 1. Actualizar Stock
+            const oldS = sales[sIdx];
+            const diff = nQ - oldS.q;
             let prods = db.get(`${currentBooth}_products`);
-            prods = prods.map(p => p.id === oldSale.pid ? {...p, s: p.s - qtyDiff} : p);
+            prods = prods.map(p => p.id === oldS.pid ? {...p, s: p.s - diff} : p);
             db.set(`${currentBooth}_products`, prods);
 
-            // 2. Actualizar Venta
-            sales[saleIndex] = { ...oldSale, q: newQty, t: newTotal };
+            sales[sIdx] = { ...oldS, q: nQ, t: nT };
             db.set(`${currentBooth}_sales`, sales);
-
-            closeSaleEditor();
-            renderSalesManager();
-            render();
-            renderRealTimeSales();
+            closeSaleEditor(); renderSalesManager(); render(); renderRealTimeSales();
         }
 
-        function deleteSale(saleId) {
-            if(!confirm("¿Borrar venta? El dinero se restará y el stock se devolverá.")) return;
-            
+        function deleteSale(id) {
+            if(!confirm("¿Borrar venta? Se reintegrará stock.")) return;
             let sales = db.get(`${currentBooth}_sales`);
-            const sale = sales.find(s => s.id === saleId);
-            if(!sale) return;
-
+            const sale = sales.find(s => s.id === id);
             let prods = db.get(`${currentBooth}_products`);
             prods = prods.map(p => p.id === sale.pid ? {...p, s: p.s + sale.q} : p);
             db.set(`${currentBooth}_products`, prods);
-
-            sales = sales.filter(s => s.id !== saleId);
-            db.set(`${currentBooth}_sales`, sales);
-
-            renderSalesManager();
-            render();
-            renderRealTimeSales();
+            db.set(`${currentBooth}_sales`, sales.filter(s => s.id !== id));
+            renderSalesManager(); render(); renderRealTimeSales();
         }
 
         function renderRealTimeSales() {
             const sales = db.get(`${currentBooth}_sales`);
-            const container = document.getElementById('real-time-sales');
-            
-            container.innerHTML = sales.slice(0, 10).map(s => `
+            document.getElementById('real-time-sales').innerHTML = sales.slice(0, 10).map(s => `
                 <div class="flex-shrink-0 bg-white border border-slate-100 p-3 rounded-2xl card-shadow min-w-[120px]">
                     <p class="text-[9px] font-bold text-slate-400 uppercase">${s.h}</p>
                     <p class="text-[11px] font-black truncate">${s.n}</p>
@@ -441,75 +465,144 @@
             `).join('');
         }
 
-        // --- FUNCIONES BASE ---
-        function changeQty(v) { selectedQty = Math.max(1, selectedQty + v); document.getElementById('sale-qty').innerText = selectedQty; }
-        function openNotes() { document.getElementById('notes-input').value = localStorage.getItem('feria_notes_text') || ""; openModal('notes-modal'); }
-        function saveNotes() { localStorage.setItem('feria_notes_text', document.getElementById('notes-input').value); }
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { 
-            document.getElementById(id).classList.add('hidden'); 
-            if(id === 'sales-manager-modal') closeSaleEditor();
-            if(id === 'stock-modal' || id === 'expenses-modal') clearSearch();
+        // --- CIERRE DE CAJA (CORREGIDO) ---
+        function confirmCloseBooth() {
+            const bName = currentBooth === 'bijou' ? 'A TU ESTILO' : 'OKIEDOKIE';
+            if(!confirm(`⚠️ ATENCIÓN: Se cerrará la caja de ${bName}.\n\n¿Estás seguro? Las ventas y gastos de hoy se guardarán en el historial y se reseteará el total a cero.`)) return;
+
+            // 1. Obtener datos actuales
+            const sales = db.get(`${currentBooth}_sales`);
+            const expenses = db.get(`${currentBooth}_expenses`);
+            
+            if(sales.length === 0 && expenses.length === 0) {
+                alert("No hay movimientos registrados para cerrar.");
+                return;
+            }
+
+            // 2. Calcular totales finales
+            let tc = 0, tm = 0;
+            sales.forEach(v => { if(v.m === 'cash') tc += v.t; else tm += v.t; });
+            expenses.forEach(g => { if(g.m === 'cash') tc -= g.a; else tm -= g.a; });
+
+            // 3. Crear registro de historial
+            const history = db.get('feria_history_v5');
+            const nuevoCierre = {
+                id: Date.now(),
+                puesto: bName,
+                fecha: new Date().toLocaleDateString(),
+                hora: new Date().toLocaleTimeString(),
+                totalCash: tc,
+                totalMp: tm,
+                movimientos: { sales, expenses }
+            };
+            
+            history.unshift(nuevoCierre);
+
+            // 4. Guardar y Limpiar (ORDEN CRÍTICO)
+            try {
+                db.set('feria_history_v5', history.slice(0, 50)); // Guardamos solo los últimos 50 para no saturar
+                db.set(`${currentBooth}_sales`, []);
+                db.set(`${currentBooth}_expenses`, []);
+                
+                // Forzar actualización visual
+                render();
+                renderRealTimeSales();
+                alert("✅ Caja cerrada correctamente. Los totales se han reiniciado.");
+                openHistory();
+            } catch(e) {
+                alert("Error al procesar el cierre. Intente nuevamente.");
+            }
         }
-        function quickAddProduct() { const name = document.getElementById('quick-add-name').innerText; openModal('stock-modal'); document.getElementById('stock-name').value = name; document.getElementById('stock-price').focus(); }
-        
-        // Stock
+
+        function openHistory() {
+            const history = db.get('feria_history_v5');
+            document.getElementById('history-content').innerHTML = history.map(x => `
+                <div class="p-4 bg-white rounded-2xl flex justify-between items-center mb-3 card-shadow border border-slate-50">
+                    <div>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">${x.puesto} - ${x.hora}</p>
+                        <p class="font-black text-[11px] uppercase">${x.fecha}</p>
+                        <p class="text-[10px] text-emerald-600 font-bold">Efe: $${x.totalCash} | MP: $${x.totalMp}</p>
+                    </div>
+                </div>
+            `).join('') || '<p class="text-center py-10 text-slate-300 uppercase text-[10px] font-bold">Sin cierres previos</p>';
+            openModal('history-modal');
+        }
+
+        // --- GESTIÓN STOCK ---
         function saveProduct() {
-            const idEdit = document.getElementById('stock-id-edit').value, n = document.getElementById('stock-name').value, p = parseInt(document.getElementById('stock-price').value), s = parseInt(document.getElementById('stock-qty').value) || 0;
+            const id = document.getElementById('stock-id-edit').value, n = document.getElementById('stock-name').value, p = parseInt(document.getElementById('stock-price').value), s = parseInt(document.getElementById('stock-qty').value) || 0;
             if(!n || isNaN(p)) return;
             let list = db.get(`${currentBooth}_products`);
-            if(idEdit) list = list.map(item => item.id == idEdit ? {...item, n, p, s} : item);
+            if(id) list = list.map(i => i.id == id ? {...i, n, p, s} : i);
             else list.push({ id: Date.now(), n, p, s });
             db.set(`${currentBooth}_products`, list);
             cancelEdit(); renderStock(); render();
         }
-        function renderStock() { document.getElementById('stock-list').innerHTML = db.get(`${currentBooth}_products`).map(p => `<div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100"><div><p class="font-black text-[11px] uppercase">${p.n}</p><p class="text-[9px] font-bold text-slate-400">$${p.p} - Stock: ${p.s}</p></div><div class="flex gap-2"><button onclick="editProduct(${p.id})" class="w-8 h-8 flex items-center justify-center bg-slate-50 text-[10px] rounded-lg">✏️</button><button onclick="deleteProduct(${p.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-400 text-[10px] rounded-lg">✕</button></div></div>`).join(''); }
-        function editProduct(id) { const p = db.get(`${currentBooth}_products`).find(x => x.id == id); document.getElementById('stock-id-edit').value = p.id; document.getElementById('stock-name').value = p.n; document.getElementById('stock-price').value = p.p; document.getElementById('stock-qty').value = p.s; document.getElementById('btn-cancel-edit').classList.remove('hidden'); }
-        function cancelEdit() { document.getElementById('stock-id-edit').value = ""; document.getElementById('stock-name').value = ""; document.getElementById('stock-price').value = ""; document.getElementById('stock-qty').value = ""; document.getElementById('btn-cancel-edit').classList.add('hidden'); }
-        function deleteProduct(id) { if(confirm("¿Borrar?")) { db.set(`${currentBooth}_products`, db.get(`${currentBooth}_products`).filter(p => p.id !== id)); renderStock(); render(); } }
-
-        function saveExpense(m) { const d = document.getElementById('exp-desc').value, a = parseInt(document.getElementById('exp-amt').value); if(!d || !a) return; const e = db.get(`${currentBooth}_expenses`); e.push({id: Date.now(), d, a, m}); db.set(`${currentBooth}_expenses`, e); document.getElementById('exp-desc').value = ""; document.getElementById('exp-amt').value = ""; closeModal('expenses-modal'); render(); }
-        
-        function confirmCloseBooth() {
-            const boothName = currentBooth === 'bijou' ? 'A TU ESTILO' : 'OKIEDOKIE';
-            if(!confirm(`¿Cerrar caja de ${boothName}?`)) return;
-            const history = db.get('feria_history_v4'), sales = db.get(`${currentBooth}_sales`), expenses = db.get(`${currentBooth}_expenses`);
-            let tC = 0, tM = 0;
-            sales.forEach(v => { if(v.m === 'cash') tC += v.t; else tM += v.t; });
-            expenses.forEach(g => { if(g.m === 'cash') tC -= g.a; else tM -= g.a; });
-            history.unshift({ id: Date.now(), puesto: boothName, fecha: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString(), ventas: sales, gastos: expenses, totalCash: `$${tC}`, totalMp: `$${tM}` });
-            db.set('feria_history_v4', history); db.set(`${currentBooth}_sales`, []); db.set(`${currentBooth}_expenses`, []);
-            render(); renderRealTimeSales(); openHistory();
+        function renderStock() {
+            document.getElementById('stock-list').innerHTML = db.get(`${currentBooth}_products`).map(p => `
+                <div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100">
+                    <div><p class="font-black text-[11px] uppercase">${p.n}</p><p class="text-[9px] font-bold text-slate-400">$${p.p} | Stock: ${p.s}</p></div>
+                    <div class="flex gap-2"><button onclick="editProduct(${p.id})" class="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg">✏️</button><button onclick="deleteProduct(${p.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-400 rounded-lg">✕</button></div>
+                </div>
+            `).join('');
         }
-        function openHistory() { document.getElementById('history-content').innerHTML = db.get('feria_history_v4').map(x => `<div class="p-4 bg-white rounded-2xl flex justify-between items-center mb-3 card-shadow"><div><p class="text-[8px] font-bold text-slate-400 uppercase">${x.puesto}</p><p class="font-black text-[10px] uppercase">${x.fecha}</p><p class="text-[10px] text-emerald-600 font-bold">${x.totalCash} | ${x.totalMp}</p></div><button onclick='alert("Detalle en desarrollo")' class="bg-slate-100 px-3 py-2 rounded-lg text-[10px] font-bold">VER</button></div>`).join(''); openModal('history-modal'); }
+        function editProduct(id) {
+            const p = db.get(`${currentBooth}_products`).find(x => x.id == id);
+            document.getElementById('stock-id-edit').value = p.id;
+            document.getElementById('stock-name').value = p.n;
+            document.getElementById('stock-price').value = p.p;
+            document.getElementById('stock-qty').value = p.s;
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+        }
+        function cancelEdit() {
+            document.getElementById('stock-id-edit').value = ""; document.getElementById('stock-name').value = ""; document.getElementById('stock-price').value = ""; document.getElementById('stock-qty').value = "";
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+        }
+        function deleteProduct(id) { if(confirm("¿Borrar producto?")) { db.set(`${currentBooth}_products`, db.get(`${currentBooth}_products`).filter(p => p.id !== id)); renderStock(); render(); } }
+
+        // --- GASTOS Y OTROS ---
+        function saveExpense(m) {
+            const d = document.getElementById('exp-desc').value, a = parseInt(document.getElementById('exp-amt').value);
+            if(!d || !a) return;
+            const ex = db.get(`${currentBooth}_expenses`);
+            ex.push({id: Date.now(), d, a, m});
+            db.set(`${currentBooth}_expenses`, ex);
+            document.getElementById('exp-desc').value = ""; document.getElementById('exp-amt').value = "";
+            closeModal('expenses-modal'); render();
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { 
+            document.getElementById(id).classList.add('hidden'); 
+            if(id === 'sales-manager-modal') closeSaleEditor();
+        }
+        function openNotes() { document.getElementById('notes-input').value = localStorage.getItem('feria_notes_text') || ""; openModal('notes-modal'); }
+        function saveNotes() { localStorage.setItem('feria_notes_text', document.getElementById('notes-input').value); }
+        function quickAddProduct() { const n = document.getElementById('quick-add-name').innerText; openModal('stock-modal'); document.getElementById('stock-name').value = n; document.getElementById('stock-price').focus(); }
 
         function showTodayReport() {
             const vB = db.get('bijou_sales'), vO = db.get('oki_sales');
             const gB = db.get('bijou_expenses'), gO = db.get('oki_expenses');
-            let tC = 0, tM = 0;
-            [...vB, ...vO].forEach(v => { if(v.m === 'cash') tC += v.t; else tM += v.t; });
-            [...gB, ...gO].forEach(g => { if(g.m === 'cash') tC -= g.a; else tM -= g.a; });
+            let tc = 0, tm = 0;
+            [...vB, ...vO].forEach(v => { if(v.m === 'cash') tc += v.t; else tm += v.t; });
+            [...gB, ...gO].forEach(g => { if(g.m === 'cash') tc -= g.a; else tm -= g.a; });
+            
             document.getElementById('report-content').innerHTML = `
-                <div class="text-center mb-8"><h1 class="text-xl font-black uppercase">REPORTE DEL DÍA</h1></div>
-                <div class="space-y-4">
-                    <div><h3 class="text-[10px] font-bold text-pink-500 border-b pb-1 mb-2">A TU ESTILO.</h3>
-                    ${vB.map(v => `<div class="flex justify-between text-[11px] py-1"><span>${v.n} x${v.q}</span><span>$${v.t}</span></div>`).join('') || '<p class="text-[10px] text-slate-300">Sin ventas</p>'}</div>
-                    <div><h3 class="text-[10px] font-bold text-indigo-500 border-b pb-1 mb-2">OKIEDOKIE</h3>
-                    ${vO.map(v => `<div class="flex justify-between text-[11px] py-1"><span>${v.n} x${v.q}</span><span>$${v.t}</span></div>`).join('') || '<p class="text-[10px] text-slate-300">Sin ventas</p>'}</div>
+                <div class="text-center mb-8"><h1 class="text-xl font-black uppercase">REPORTE INTEGRAL</h1><p class="text-[10px] text-slate-400 font-bold uppercase">${new Date().toLocaleDateString()}</p></div>
+                <div class="space-y-6">
+                    <div><h3 class="text-[9px] font-black text-pink-500 border-b pb-1 mb-2">✨ A TU ESTILO.</h3>
+                    ${vB.map(v => `<div class="flex justify-between text-[11px] py-1"><span>${v.n} x${v.q}</span><span class="font-bold">$${v.t}</span></div>`).join('') || '<p class="text-[10px] text-slate-300">Sin ventas</p>'}</div>
+                    <div><h3 class="text-[9px] font-black text-indigo-500 border-b pb-1 mb-2">🤖 OKIEDOKIE</h3>
+                    ${vO.map(v => `<div class="flex justify-between text-[11px] py-1"><span>${v.n} x${v.q}</span><span class="font-bold">$${v.t}</span></div>`).join('') || '<p class="text-[10px] text-slate-300">Sin ventas</p>'}</div>
                 </div>
                 <div class="mt-8 bg-slate-900 p-6 rounded-3xl text-white">
-                    <div class="flex justify-between mb-2"><span class="text-[10px] opacity-60">EFECTIVO TOTAL:</span><span class="font-bold">$${tC}</span></div>
-                    <div class="flex justify-between"><span class="text-[10px] opacity-60">M. PAGO TOTAL:</span><span class="font-bold">$${tM}</span></div>
+                    <p class="text-[10px] font-bold opacity-50 uppercase mb-4 text-center">Balance Total General</p>
+                    <div class="flex justify-between mb-2 text-sm"><span class="opacity-80">EFECTIVO:</span><span class="font-black text-emerald-400">$${tc.toLocaleString()}</span></div>
+                    <div class="flex justify-between text-sm"><span class="opacity-80">M. PAGO:</span><span class="font-black text-sky-400">$${tm.toLocaleString()}</span></div>
                 </div>
             `;
             openModal('report-modal');
         }
-
-        window.onload = () => {
-            if(db.get('bijou_products').length === 0) db.set('bijou_products', [{id:1, n:'Pulsera Roja', p:1000, s:10}]);
-            if(db.get('oki_products').length === 0) db.set('oki_products', [{id:101, n:'Muñeco Oki', p:5000, s:5}]);
-            setBooth('bijou');
-        };
     </script>
 </body>
 </html>
