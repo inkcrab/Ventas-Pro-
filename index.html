@@ -92,7 +92,7 @@
             <button onclick="openModal('expenses-modal')" class="btn-action bg-white border border-slate-100 text-[#dc2626] shadow-sm">💸 GASTOS</button>
         </div>
 
-        <!-- Buscador con X -->
+        <!-- Buscador -->
         <div class="space-y-3 mb-8 no-print">
             <div class="relative flex items-center">
                 <input type="text" id="product-search" oninput="handleSearch()" placeholder="🔍 Buscar producto..." class="w-full py-4 px-6 pr-12 rounded-2xl bg-white border border-slate-100 shadow-sm outline-none font-medium text-slate-500">
@@ -201,75 +201,43 @@
         </div>
     </div>
 
-    <!-- MODAL HISTORIAL -->
+    <!-- MODAL HISTORIAL DE CIERRES -->
     <div id="history-modal" class="hidden fixed inset-0 bg-white z-[100] p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto">
+        <div class="max-w-md mx-auto pb-10">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="font-bold uppercase text-xs">📂 Historial de Cierres</h2>
                 <button onclick="closeModal('history-modal')" class="text-2xl">✕</button>
             </div>
-            <div id="history-content" class="space-y-3"></div>
+            <div id="history-content" class="space-y-4"></div>
         </div>
     </div>
 
-    <!-- MODAL NOTAS -->
-    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[100] p-6">
+    <!-- MODAL DETALLE DE CIERRE ESPECÍFICO -->
+    <div id="history-detail-modal" class="hidden fixed inset-0 bg-slate-50 z-[210] p-6 overflow-y-auto">
         <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="font-bold text-amber-600 uppercase text-xs">📝 Notas</h2>
-                <button onclick="closeModal('notes-modal')" class="text-2xl">✕</button>
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="closeModal('history-detail-modal')" class="text-slate-400 font-bold uppercase text-[10px]">← Volver</button>
+                <h2 class="font-black text-xs uppercase tracking-widest">Resumen de Cierre</h2>
             </div>
-            <textarea id="notes-input" oninput="saveNotes()" class="w-full h-[65vh] p-6 bg-amber-50 rounded-[2rem] border-none outline-none font-medium text-amber-900"></textarea>
+            <div id="history-detail-content"></div>
         </div>
     </div>
 
-    <!-- MODAL GASTOS -->
-    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[100] p-6">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="font-bold text-red-500 uppercase text-xs">💸 Cargar Gasto</h2>
-                <button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button>
-            </div>
-            <input id="exp-desc" type="text" placeholder="Concepto (ej: Comida)" class="w-full p-4 bg-slate-50 rounded-2xl mb-3 font-bold">
-            <input id="exp-amt" type="number" placeholder="Monto $" class="w-full p-4 bg-slate-50 rounded-2xl mb-6 font-bold">
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="saveExpense('cash')" class="py-4 bg-emerald-500 text-white font-bold rounded-2xl text-[10px] uppercase">Efectivo</button>
-                <button onclick="saveExpense('mp')" class="py-4 bg-sky-500 text-white font-bold rounded-2xl text-[10px] uppercase">M. Pago</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL REPORTE -->
-    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto">
-            <div class="flex justify-between items-center no-print mb-8">
-                <button onclick="closeModal('report-modal')" class="text-slate-400 font-bold uppercase text-[10px]">✕</button>
-                <button onclick="window.print()" class="bg-black text-white px-4 py-2 rounded-xl text-[10px]">IMPRIMIR</button>
-            </div>
-            <div id="report-content"></div>
-        </div>
-    </div>
+    <!-- OTROS MODALES -->
+    <div id="notes-modal" class="hidden fixed inset-0 bg-white z-[100] p-6"><div class="max-w-md mx-auto"><div class="flex justify-between items-center mb-8"><h2 class="font-bold text-amber-600 uppercase text-xs">📝 Notas</h2><button onclick="closeModal('notes-modal')" class="text-2xl">✕</button></div><textarea id="notes-input" oninput="saveNotes()" class="w-full h-[65vh] p-6 bg-amber-50 rounded-[2rem] border-none outline-none font-medium text-amber-900"></textarea></div></div>
+    <div id="expenses-modal" class="hidden fixed inset-0 bg-white z-[100] p-6"><div class="max-w-md mx-auto"><div class="flex justify-between items-center mb-8"><h2 class="font-bold text-red-500 uppercase text-xs">💸 Gasto</h2><button onclick="closeModal('expenses-modal')" class="text-2xl">✕</button></div><input id="exp-desc" type="text" placeholder="Concepto" class="w-full p-4 bg-slate-50 rounded-2xl mb-3 font-bold"><input id="exp-amt" type="number" placeholder="Monto $" class="w-full p-4 bg-slate-50 rounded-2xl mb-6 font-bold"><div class="grid grid-cols-2 gap-3"><button onclick="saveExpense('cash')" class="py-4 bg-emerald-500 text-white font-bold rounded-2xl text-[10px] uppercase">Efectivo</button><button onclick="saveExpense('mp')" class="py-4 bg-sky-500 text-white font-bold rounded-2xl text-[10px] uppercase">M. Pago</button></div></div></div>
+    <div id="report-modal" class="hidden fixed inset-0 bg-white z-[200] p-6 overflow-y-auto"><div class="max-w-md mx-auto"><div class="flex justify-between items-center no-print mb-8"><button onclick="closeModal('report-modal')" class="text-slate-400 font-bold uppercase text-[10px]">✕</button><button onclick="window.print()" class="bg-black text-white px-4 py-2 rounded-xl text-[10px]">IMPRIMIR</button></div><div id="report-content"></div></div></div>
 
     <script>
-        // --- CONFIGURACIÓN Y ESTADO ---
         let currentBooth = 'bijou';
         let selectedProduct = null;
         let selectedQty = 1;
 
         const db = {
-            get: (key) => {
-                try {
-                    return JSON.parse(localStorage.getItem(key)) || [];
-                } catch(e) { return []; }
-            },
-            set: (key, val) => {
-                try {
-                    localStorage.setItem(key, JSON.stringify(val));
-                } catch(e) { console.error("Error guardando datos", e); }
-            }
+            get: (key) => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; } },
+            set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) { console.error("Error", e); } }
         };
 
-        // --- INICIO ---
         window.onload = () => {
             if(db.get('bijou_products').length === 0) {
                 db.set('bijou_products', [{id:1, n:'Ejemplo Bijou', p:1000, s:10}]);
@@ -280,313 +248,168 @@
 
         function setBooth(b) {
             currentBooth = b;
-            const tBijou = document.getElementById('tab-bijou');
-            const tOki = document.getElementById('tab-oki');
-            if(b === 'bijou') {
-                tBijou.className = "flex-1 py-4 text-[11px] uppercase tracking-wider tab-active-pink";
-                tOki.className = "flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400";
-            } else {
-                tBijou.className = "flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400";
-                tOki.className = "flex-1 py-4 text-[11px] uppercase tracking-wider tab-active-blue";
-            }
-            render();
-            renderRealTimeSales();
+            const tB = document.getElementById('tab-bijou'), tO = document.getElementById('tab-oki');
+            if(b === 'bijou') { tB.className = "flex-1 py-4 text-[11px] uppercase tracking-wider tab-active-pink"; tO.className = "flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400"; }
+            else { tB.className = "flex-1 py-4 text-[11px] uppercase tracking-wider text-slate-400"; tO.className = "flex-1 py-4 text-[11px] uppercase tracking-wider tab-active-blue"; }
+            render(); renderRealTimeSales();
         }
 
-        function changeBooth(b) {
-            clearSearch();
-            setBooth(b);
-        }
-
-        // --- BUSCADOR ---
-        function clearSearch() {
-            const input = document.getElementById('product-search');
-            input.value = "";
-            document.getElementById('clear-search').classList.add('hidden');
-            document.getElementById('quick-add-container').classList.add('hidden');
-            render();
-        }
-
+        function changeBooth(b) { clearSearch(); setBooth(b); }
+        function clearSearch() { document.getElementById('product-search').value = ""; document.getElementById('clear-search').classList.add('hidden'); document.getElementById('quick-add-container').classList.add('hidden'); render(); }
         function handleSearch() {
-            const q = document.getElementById('product-search').value;
-            const clearBtn = document.getElementById('clear-search');
-            const quickAdd = document.getElementById('quick-add-container');
-            const prods = db.get(`${currentBooth}_products`);
-            
-            if(q.length > 0) clearBtn.classList.remove('hidden');
-            else clearBtn.classList.add('hidden');
-
+            const q = document.getElementById('product-search').value, clearBtn = document.getElementById('clear-search'), quickAdd = document.getElementById('quick-add-container'), prods = db.get(`${currentBooth}_products`);
+            if(q.length > 0) clearBtn.classList.remove('hidden'); else clearBtn.classList.add('hidden');
             const match = prods.some(p => p.n.toLowerCase() === q.toLowerCase());
-            if(q.length > 2 && !match) {
-                quickAdd.classList.remove('hidden');
-                document.getElementById('quick-add-name').innerText = q;
-            } else {
-                quickAdd.classList.add('hidden');
-            }
+            if(q.length > 2 && !match) { quickAdd.classList.remove('hidden'); document.getElementById('quick-add-name').innerText = q; } else quickAdd.classList.add('hidden');
             render();
         }
 
-        // --- RENDER PRINCIPAL ---
         function render() {
-            let bCash = 0, bMp = 0;
-            const sales = db.get(`${currentBooth}_sales`);
-            const expenses = db.get(`${currentBooth}_expenses`);
-            
-            sales.forEach(s => { if(s.m === 'cash') bCash += s.t; else bMp += s.t; });
-            expenses.forEach(e => { if(e.m === 'cash') bCash -= e.a; else bMp -= e.a; });
-
-            document.getElementById('cash-display').innerText = `$${bCash.toLocaleString()}`;
-            document.getElementById('mp-display').innerText = `$${bMp.toLocaleString()}`;
-
-            const q = document.getElementById('product-search').value.toLowerCase();
-            const prods = db.get(`${currentBooth}_products`);
-            const grid = document.getElementById('products-grid');
-            
+            let bC = 0, bM = 0;
+            db.get(`${currentBooth}_sales`).forEach(s => { if(s.m === 'cash') bC += s.t; else bM += s.t; });
+            db.get(`${currentBooth}_expenses`).forEach(e => { if(e.m === 'cash') bC -= e.a; else bM -= e.a; });
+            document.getElementById('cash-display').innerText = `$${bC.toLocaleString()}`;
+            document.getElementById('mp-display').innerText = `$${bM.toLocaleString()}`;
+            const q = document.getElementById('product-search').value.toLowerCase(), prods = db.get(`${currentBooth}_products`), grid = document.getElementById('products-grid');
             grid.innerHTML = prods.filter(p => p.n.toLowerCase().includes(q)).map(p => {
                 const isOut = p.s <= 0;
-                return `
-                <button onclick="openSale(${p.id})" class="product-card card-shadow ${isOut ? 'out-of-stock' : ''}">
-                    <span class="badge-stock ${isOut ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500'}">
-                        ${isOut ? 'SIN STOCK' : p.s + ' u.'}
-                    </span>
-                    <span class="text-[11px] font-bold uppercase text-slate-400 mb-2 truncate w-full">${p.n}</span>
-                    <span class="text-xl font-extrabold text-[#6366f1]">$${p.p.toLocaleString()}</span>
-                </button>
-            `}).join('');
+                return `<button onclick="openSale(${p.id})" class="product-card card-shadow ${isOut ? 'out-of-stock' : ''}"><span class="badge-stock ${isOut ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500'}">${isOut ? 'SIN STOCK' : p.s + ' u.'}</span><span class="text-[11px] font-bold uppercase text-slate-400 mb-2 truncate w-full">${p.n}</span><span class="text-xl font-extrabold text-[#6366f1]">$${p.p.toLocaleString()}</span></button>`
+            }).join('');
         }
 
-        // --- VENTAS ---
-        function openSale(id) {
-            selectedProduct = db.get(`${currentBooth}_products`).find(p => p.id === id);
-            selectedQty = 1;
-            document.getElementById('sale-product-name').innerText = selectedProduct.n;
-            document.getElementById('sale-qty').innerText = "1";
-            document.getElementById('sale-stock-warning').innerText = selectedProduct.s <= 0 ? "¡VENDIENDO SIN STOCK!" : "";
-            openModal('sale-modal');
-        }
-
+        function openSale(id) { selectedProduct = db.get(`${currentBooth}_products`).find(p => p.id === id); selectedQty = 1; document.getElementById('sale-product-name').innerText = selectedProduct.n; document.getElementById('sale-qty').innerText = "1"; document.getElementById('sale-stock-warning').innerText = selectedProduct.s <= 0 ? "¡VENDIENDO SIN STOCK!" : ""; openModal('sale-modal'); }
         function processSale(m) {
-            const sales = db.get(`${currentBooth}_sales`);
-            sales.unshift({
-                id: Date.now(),
-                pid: selectedProduct.id,
-                n: selectedProduct.n,
-                q: selectedQty,
-                t: selectedProduct.p * selectedQty,
-                m,
-                h: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            });
-            db.set(`${currentBooth}_sales`, sales);
-
-            let prods = db.get(`${currentBooth}_products`);
-            prods = prods.map(p => p.id === selectedProduct.id ? {...p, s: p.s - selectedQty} : p);
-            db.set(`${currentBooth}_products`, prods);
-
-            closeModal('sale-modal');
-            clearSearch();
-            renderRealTimeSales();
+            const s = db.get(`${currentBooth}_sales`);
+            s.unshift({ id: Date.now(), pid: selectedProduct.id, n: selectedProduct.n, q: selectedQty, t: selectedProduct.p * selectedQty, m, h: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            db.set(`${currentBooth}_sales`, s);
+            let pr = db.get(`${currentBooth}_products`);
+            pr = pr.map(p => p.id === selectedProduct.id ? {...p, s: p.s - selectedQty} : p);
+            db.set(`${currentBooth}_products`, pr);
+            closeModal('sale-modal'); clearSearch(); renderRealTimeSales();
         }
-
         function changeQty(v) { selectedQty = Math.max(1, selectedQty + v); document.getElementById('sale-qty').innerText = selectedQty; }
 
-        // --- ADMINISTRACIÓN Y EDICIÓN ---
         function renderSalesManager() {
-            const sales = db.get(`${currentBooth}_sales`);
-            const container = document.getElementById('sales-manager-list');
-            if(sales.length === 0) {
-                container.innerHTML = `<p class="text-center py-10 text-slate-300 uppercase text-[10px] font-bold">No hay ventas registradas hoy</p>`;
-                return;
-            }
-            container.innerHTML = sales.map(s => `
-                <div class="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
-                    <div>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase">${s.h} - ${s.m==='cash'?'EFECTIVO':'M.PAGO'}</p>
-                        <p class="font-black text-[11px] uppercase">${s.n} (x${s.q})</p>
-                        <p class="font-bold text-indigo-500 text-[10px]">$${s.t}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="openSaleEditor(${s.id})" class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl font-bold flex items-center justify-center">✏️</button>
-                        <button onclick="deleteSale(${s.id})" class="w-10 h-10 bg-red-50 text-red-500 rounded-xl font-bold flex items-center justify-center">✕</button>
-                    </div>
-                </div>
-            `).join('');
+            const s = db.get(`${currentBooth}_sales`), container = document.getElementById('sales-manager-list');
+            if(s.length === 0) { container.innerHTML = `<p class="text-center py-10 text-slate-300 uppercase text-[10px] font-bold">No hay ventas</p>`; return; }
+            container.innerHTML = s.map(s => `<div class="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center"><div><p class="text-[9px] font-bold text-slate-400 uppercase">${s.h} - ${s.m==='cash'?'EFE':'MP'}</p><p class="font-black text-[11px] uppercase">${s.n} (x${s.q})</p><p class="font-bold text-indigo-500 text-[10px]">$${s.t}</p></div><div class="flex gap-2"><button onclick="openSaleEditor(${s.id})" class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl font-bold flex items-center justify-center">✏️</button><button onclick="deleteSale(${s.id})" class="w-10 h-10 bg-red-50 text-red-500 rounded-xl font-bold flex items-center justify-center">✕</button></div></div>`).join('');
         }
 
-        function openSaleEditor(id) {
-            const sale = db.get(`${currentBooth}_sales`).find(s => s.id === id);
-            if(!sale) return;
-            document.getElementById('edit-sale-id').value = sale.id;
-            document.getElementById('edit-sale-qty').value = sale.q;
-            document.getElementById('edit-sale-total').value = sale.t;
-            document.getElementById('sale-editor-form').classList.remove('hidden');
-            document.getElementById('sales-manager-modal').scrollTo(0,0);
-        }
-
+        function openSaleEditor(id) { const s = db.get(`${currentBooth}_sales`).find(s => s.id === id); document.getElementById('edit-sale-id').value = s.id; document.getElementById('edit-sale-qty').value = s.q; document.getElementById('edit-sale-total').value = s.t; document.getElementById('sale-editor-form').classList.remove('hidden'); }
         function closeSaleEditor() { document.getElementById('sale-editor-form').classList.add('hidden'); }
-
         function saveSaleEdit() {
-            const id = parseInt(document.getElementById('edit-sale-id').value);
-            const nQ = parseInt(document.getElementById('edit-sale-qty').value);
-            const nT = parseInt(document.getElementById('edit-sale-total').value);
-            let sales = db.get(`${currentBooth}_sales`);
-            const sIdx = sales.findIndex(s => s.id === id);
-            if(sIdx === -1) return;
-
-            const oldS = sales[sIdx];
-            const diff = nQ - oldS.q;
-            let prods = db.get(`${currentBooth}_products`);
-            prods = prods.map(p => p.id === oldS.pid ? {...p, s: p.s - diff} : p);
-            db.set(`${currentBooth}_products`, prods);
-
-            sales[sIdx] = { ...oldS, q: nQ, t: nT };
-            db.set(`${currentBooth}_sales`, sales);
+            const id = parseInt(document.getElementById('edit-sale-id').value), nQ = parseInt(document.getElementById('edit-sale-qty').value), nT = parseInt(document.getElementById('edit-sale-total').value);
+            let s = db.get(`${currentBooth}_sales`); const idx = s.findIndex(v => v.id === id); const old = s[idx]; const diff = nQ - old.q;
+            let pr = db.get(`${currentBooth}_products`); pr = pr.map(p => p.id === old.pid ? {...p, s: p.s - diff} : p); db.set(`${currentBooth}_products`, pr);
+            s[idx] = { ...old, q: nQ, t: nT }; db.set(`${currentBooth}_sales`, s);
             closeSaleEditor(); renderSalesManager(); render(); renderRealTimeSales();
         }
+        function deleteSale(id) { if(confirm("¿Borrar?")) { let s = db.get(`${currentBooth}_sales`); const v = s.find(x => x.id === id); let pr = db.get(`${currentBooth}_products`); pr = pr.map(p => p.id === v.pid ? {...p, s: p.s + v.q} : p); db.set(`${currentBooth}_products`, pr); db.set(`${currentBooth}_sales`, s.filter(x => x.id !== id)); renderSalesManager(); render(); renderRealTimeSales(); } }
+        function renderRealTimeSales() { const s = db.get(`${currentBooth}_sales`); document.getElementById('real-time-sales').innerHTML = s.slice(0, 10).map(s => `<div class="flex-shrink-0 bg-white border border-slate-100 p-3 rounded-2xl card-shadow min-w-[120px]"><p class="text-[9px] font-bold text-slate-400 uppercase">${s.h}</p><p class="text-[11px] font-black truncate">${s.n}</p><p class="text-[10px] font-bold ${s.m==='cash'?'text-emerald-500':'text-sky-500'}">$${s.t}</p></div>`).join(''); }
 
-        function deleteSale(id) {
-            if(!confirm("¿Borrar venta? Se reintegrará stock.")) return;
-            let sales = db.get(`${currentBooth}_sales`);
-            const sale = sales.find(s => s.id === id);
-            let prods = db.get(`${currentBooth}_products`);
-            prods = prods.map(p => p.id === sale.pid ? {...p, s: p.s + sale.q} : p);
-            db.set(`${currentBooth}_products`, prods);
-            db.set(`${currentBooth}_sales`, sales.filter(s => s.id !== id));
-            renderSalesManager(); render(); renderRealTimeSales();
-        }
-
-        function renderRealTimeSales() {
-            const sales = db.get(`${currentBooth}_sales`);
-            document.getElementById('real-time-sales').innerHTML = sales.slice(0, 10).map(s => `
-                <div class="flex-shrink-0 bg-white border border-slate-100 p-3 rounded-2xl card-shadow min-w-[120px]">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase">${s.h}</p>
-                    <p class="text-[11px] font-black truncate">${s.n}</p>
-                    <p class="text-[10px] font-bold ${s.m==='cash'?'text-emerald-500':'text-sky-500'}">$${s.t}</p>
-                </div>
-            `).join('');
-        }
-
-        // --- CIERRE DE CAJA (CORREGIDO) ---
+        // --- HISTORIAL DETALLADO ---
         function confirmCloseBooth() {
-            const bName = currentBooth === 'bijou' ? 'A TU ESTILO' : 'OKIEDOKIE';
-            if(!confirm(`⚠️ ATENCIÓN: Se cerrará la caja de ${bName}.\n\n¿Estás seguro? Las ventas y gastos de hoy se guardarán en el historial y se reseteará el total a cero.`)) return;
-
-            // 1. Obtener datos actuales
-            const sales = db.get(`${currentBooth}_sales`);
-            const expenses = db.get(`${currentBooth}_expenses`);
-            
-            if(sales.length === 0 && expenses.length === 0) {
-                alert("No hay movimientos registrados para cerrar.");
-                return;
-            }
-
-            // 2. Calcular totales finales
+            const bN = currentBooth === 'bijou' ? 'A TU ESTILO' : 'OKIEDOKIE';
+            if(!confirm(`¿Cerrar caja de ${bN}? Se guardará el detalle completo.`)) return;
+            const sales = db.get(`${currentBooth}_sales`), expenses = db.get(`${currentBooth}_expenses`);
+            if(sales.length === 0 && expenses.length === 0) { alert("Sin movimientos."); return; }
             let tc = 0, tm = 0;
             sales.forEach(v => { if(v.m === 'cash') tc += v.t; else tm += v.t; });
             expenses.forEach(g => { if(g.m === 'cash') tc -= g.a; else tm -= g.a; });
-
-            // 3. Crear registro de historial
-            const history = db.get('feria_history_v5');
-            const nuevoCierre = {
-                id: Date.now(),
-                puesto: bName,
-                fecha: new Date().toLocaleDateString(),
-                hora: new Date().toLocaleTimeString(),
-                totalCash: tc,
-                totalMp: tm,
-                movimientos: { sales, expenses }
-            };
-            
-            history.unshift(nuevoCierre);
-
-            // 4. Guardar y Limpiar (ORDEN CRÍTICO)
-            try {
-                db.set('feria_history_v5', history.slice(0, 50)); // Guardamos solo los últimos 50 para no saturar
-                db.set(`${currentBooth}_sales`, []);
-                db.set(`${currentBooth}_expenses`, []);
-                
-                // Forzar actualización visual
-                render();
-                renderRealTimeSales();
-                alert("✅ Caja cerrada correctamente. Los totales se han reiniciado.");
-                openHistory();
-            } catch(e) {
-                alert("Error al procesar el cierre. Intente nuevamente.");
-            }
+            const history = db.get('feria_history_v6');
+            history.unshift({ id: Date.now(), puesto: bN, fecha: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString(), totalCash: tc, totalMp: tm, detail: { sales, expenses } });
+            db.set('feria_history_v6', history.slice(0, 50)); db.set(`${currentBooth}_sales`, []); db.set(`${currentBooth}_expenses`, []);
+            render(); renderRealTimeSales(); openHistory();
         }
 
         function openHistory() {
-            const history = db.get('feria_history_v5');
-            document.getElementById('history-content').innerHTML = history.map(x => `
-                <div class="p-4 bg-white rounded-2xl flex justify-between items-center mb-3 card-shadow border border-slate-50">
-                    <div>
-                        <p class="text-[8px] font-bold text-slate-400 uppercase">${x.puesto} - ${x.hora}</p>
-                        <p class="font-black text-[11px] uppercase">${x.fecha}</p>
-                        <p class="text-[10px] text-emerald-600 font-bold">Efe: $${x.totalCash} | MP: $${x.totalMp}</p>
+            const h = db.get('feria_history_v6');
+            document.getElementById('history-content').innerHTML = h.map(x => `
+                <div class="p-5 bg-white rounded-[2rem] card-shadow border border-slate-50">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${x.puesto}</p>
+                            <h4 class="font-black text-slate-800 text-sm uppercase">${x.fecha}</h4>
+                            <p class="text-[10px] text-slate-400 font-bold">${x.hora}</p>
+                        </div>
+                        <button onclick="deleteHistoryItem(${x.id})" class="text-slate-200 hover:text-red-400 p-2">✕</button>
                     </div>
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <div class="bg-emerald-50 p-3 rounded-2xl"><p class="text-[8px] font-bold text-emerald-600 uppercase">Efectivo</p><p class="font-black text-emerald-700">$${x.totalCash}</p></div>
+                        <div class="bg-sky-50 p-3 rounded-2xl"><p class="text-[8px] font-bold text-sky-600 uppercase">M. Pago</p><p class="font-black text-sky-700">$${x.totalMp}</p></div>
+                    </div>
+                    <button onclick="viewHistoryDetail(${x.id})" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-[10px] uppercase tracking-tighter">Ver detalle completo</button>
                 </div>
-            `).join('') || '<p class="text-center py-10 text-slate-300 uppercase text-[10px] font-bold">Sin cierres previos</p>';
+            `).join('') || '<p class="text-center py-20 text-slate-300 uppercase text-[10px] font-bold">No hay cierres guardados</p>';
             openModal('history-modal');
         }
 
-        // --- GESTIÓN STOCK ---
+        function viewHistoryDetail(id) {
+            const x = db.get('feria_history_v6').find(i => i.id === id);
+            if(!x || !x.detail) { alert("Este registro no tiene detalle guardado."); return; }
+            
+            document.getElementById('history-detail-content').innerHTML = `
+                <div class="bg-white rounded-[2.5rem] p-8 card-shadow mb-6">
+                    <p class="text-center text-[10px] font-black text-indigo-500 uppercase mb-2">${x.puesto}</p>
+                    <h2 class="text-center font-black text-2xl uppercase mb-8">${x.fecha}</h2>
+                    
+                    <div class="mb-8">
+                        <h5 class="text-[9px] font-black text-slate-400 border-b pb-2 mb-4 uppercase tracking-widest">Ventas Realizadas</h5>
+                        <div class="space-y-3">
+                            ${x.detail.sales.map(s => `
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-500 font-medium">${s.h} - <span class="text-slate-800 font-bold uppercase">${s.n}</span> x${s.q}</span>
+                                    <span class="font-black text-indigo-600">$${s.t} (${s.m === 'cash' ? 'E' : 'MP'})</span>
+                                </div>
+                            `).join('') || '<p class="text-center text-slate-300 py-2">Sin ventas</p>'}
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h5 class="text-[9px] font-black text-red-400 border-b pb-2 mb-4 uppercase tracking-widest">Gastos Cargados</h5>
+                        <div class="space-y-3">
+                            ${x.detail.expenses.map(g => `
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-800 font-bold uppercase">${g.d}</span>
+                                    <span class="font-black text-red-500">-$${g.a} (${g.m === 'cash' ? 'E' : 'MP'})</span>
+                                </div>
+                            `).join('') || '<p class="text-center text-slate-300 py-2">Sin gastos</p>'}
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t-2 border-dashed border-slate-100 flex justify-between">
+                        <div class="text-left"><p class="text-[8px] font-bold text-slate-400 uppercase">Efectivo final</p><p class="text-xl font-black text-emerald-600">$${x.totalCash}</p></div>
+                        <div class="text-right"><p class="text-[8px] font-bold text-slate-400 uppercase">M.Pago final</p><p class="text-xl font-black text-sky-600">$${x.totalMp}</p></div>
+                    </div>
+                </div>
+            `;
+            openModal('history-detail-modal');
+        }
+
+        function deleteHistoryItem(id) { if(confirm("¿Eliminar este registro del historial?")) { db.set('feria_history_v6', db.get('feria_history_v6').filter(i => i.id !== id)); openHistory(); } }
+
+        // --- OTROS ---
         function saveProduct() {
             const id = document.getElementById('stock-id-edit').value, n = document.getElementById('stock-name').value, p = parseInt(document.getElementById('stock-price').value), s = parseInt(document.getElementById('stock-qty').value) || 0;
-            if(!n || isNaN(p)) return;
-            let list = db.get(`${currentBooth}_products`);
-            if(id) list = list.map(i => i.id == id ? {...i, n, p, s} : i);
-            else list.push({ id: Date.now(), n, p, s });
-            db.set(`${currentBooth}_products`, list);
-            cancelEdit(); renderStock(); render();
+            if(!n || isNaN(p)) return; let l = db.get(`${currentBooth}_products`);
+            if(id) l = l.map(i => i.id == id ? {...i, n, p, s} : i); else l.push({ id: Date.now(), n, p, s });
+            db.set(`${currentBooth}_products`, l); cancelEdit(); renderStock(); render();
         }
-        function renderStock() {
-            document.getElementById('stock-list').innerHTML = db.get(`${currentBooth}_products`).map(p => `
-                <div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100">
-                    <div><p class="font-black text-[11px] uppercase">${p.n}</p><p class="text-[9px] font-bold text-slate-400">$${p.p} | Stock: ${p.s}</p></div>
-                    <div class="flex gap-2"><button onclick="editProduct(${p.id})" class="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg">✏️</button><button onclick="deleteProduct(${p.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-400 rounded-lg">✕</button></div>
-                </div>
-            `).join('');
-        }
-        function editProduct(id) {
-            const p = db.get(`${currentBooth}_products`).find(x => x.id == id);
-            document.getElementById('stock-id-edit').value = p.id;
-            document.getElementById('stock-name').value = p.n;
-            document.getElementById('stock-price').value = p.p;
-            document.getElementById('stock-qty').value = p.s;
-            document.getElementById('btn-cancel-edit').classList.remove('hidden');
-        }
-        function cancelEdit() {
-            document.getElementById('stock-id-edit').value = ""; document.getElementById('stock-name').value = ""; document.getElementById('stock-price').value = ""; document.getElementById('stock-qty').value = "";
-            document.getElementById('btn-cancel-edit').classList.add('hidden');
-        }
-        function deleteProduct(id) { if(confirm("¿Borrar producto?")) { db.set(`${currentBooth}_products`, db.get(`${currentBooth}_products`).filter(p => p.id !== id)); renderStock(); render(); } }
+        function renderStock() { document.getElementById('stock-list').innerHTML = db.get(`${currentBooth}_products`).map(p => `<div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100"><div><p class="font-black text-[11px] uppercase">${p.n}</p><p class="text-[9px] font-bold text-slate-400">$${p.p} | Stock: ${p.s}</p></div><div class="flex gap-2"><button onclick="editProduct(${p.id})" class="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg">✏️</button><button onclick="deleteProduct(${p.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-400 rounded-lg">✕</button></div></div>`).join(''); }
+        function editProduct(id) { const p = db.get(`${currentBooth}_products`).find(x => x.id == id); document.getElementById('stock-id-edit').value = p.id; document.getElementById('stock-name').value = p.n; document.getElementById('stock-price').value = p.p; document.getElementById('stock-qty').value = p.s; document.getElementById('btn-cancel-edit').classList.remove('hidden'); }
+        function cancelEdit() { document.getElementById('stock-id-edit').value = ""; document.getElementById('stock-name').value = ""; document.getElementById('stock-price').value = ""; document.getElementById('stock-qty').value = ""; document.getElementById('btn-cancel-edit').classList.add('hidden'); }
+        function deleteProduct(id) { if(confirm("¿Borrar?")) { db.set(`${currentBooth}_products`, db.get(`${currentBooth}_products`).filter(p => p.id !== id)); renderStock(); render(); } }
 
-        // --- GASTOS Y OTROS ---
-        function saveExpense(m) {
-            const d = document.getElementById('exp-desc').value, a = parseInt(document.getElementById('exp-amt').value);
-            if(!d || !a) return;
-            const ex = db.get(`${currentBooth}_expenses`);
-            ex.push({id: Date.now(), d, a, m});
-            db.set(`${currentBooth}_expenses`, ex);
-            document.getElementById('exp-desc').value = ""; document.getElementById('exp-amt').value = "";
-            closeModal('expenses-modal'); render();
-        }
-
+        function saveExpense(m) { const d = document.getElementById('exp-desc').value, a = parseInt(document.getElementById('exp-amt').value); if(!d || !a) return; const ex = db.get(`${currentBooth}_expenses`); ex.push({id: Date.now(), d, a, m}); db.set(`${currentBooth}_expenses`, ex); document.getElementById('exp-desc').value = ""; document.getElementById('exp-amt').value = ""; closeModal('expenses-modal'); render(); }
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { 
-            document.getElementById(id).classList.add('hidden'); 
-            if(id === 'sales-manager-modal') closeSaleEditor();
-        }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); if(id === 'sales-manager-modal') closeSaleEditor(); }
         function openNotes() { document.getElementById('notes-input').value = localStorage.getItem('feria_notes_text') || ""; openModal('notes-modal'); }
         function saveNotes() { localStorage.setItem('feria_notes_text', document.getElementById('notes-input').value); }
         function quickAddProduct() { const n = document.getElementById('quick-add-name').innerText; openModal('stock-modal'); document.getElementById('stock-name').value = n; document.getElementById('stock-price').focus(); }
 
         function showTodayReport() {
-            const vB = db.get('bijou_sales'), vO = db.get('oki_sales');
-            const gB = db.get('bijou_expenses'), gO = db.get('oki_expenses');
-            let tc = 0, tm = 0;
-            [...vB, ...vO].forEach(v => { if(v.m === 'cash') tc += v.t; else tm += v.t; });
-            [...gB, ...gO].forEach(g => { if(g.m === 'cash') tc -= g.a; else tm -= g.a; });
-            
+            const vB = db.get('bijou_sales'), vO = db.get('oki_sales'), gB = db.get('bijou_expenses'), gO = db.get('oki_expenses');
+            let tc = 0, tm = 0; [...vB, ...vO].forEach(v => { if(v.m === 'cash') tc += v.t; else tm += v.t; }); [...gB, ...gO].forEach(g => { if(g.m === 'cash') tc -= g.a; else tm -= g.a; });
             document.getElementById('report-content').innerHTML = `
                 <div class="text-center mb-8"><h1 class="text-xl font-black uppercase">REPORTE INTEGRAL</h1><p class="text-[10px] text-slate-400 font-bold uppercase">${new Date().toLocaleDateString()}</p></div>
                 <div class="space-y-6">
